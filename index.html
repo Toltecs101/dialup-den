@@ -48,6 +48,9 @@ button{cursor:pointer}
 #ytHost iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;background:#000;display:block}
 #ytHost.off{visibility:hidden}
 #ytHost.big{z-index:37;pointer-events:auto;overflow:hidden;border-radius:10px;background:#000}
+#ytHost.full{z-index:72;width:100%;height:100%;pointer-events:auto;background:#000}
+#fsExit{position:fixed;top:calc(10px + var(--sat));right:calc(10px + var(--sar));z-index:73;min-height:38px;padding:4px 12px;font-size:13px;opacity:.85}
+#fsExit[hidden]{display:none}
 .yt-now{display:flex;flex-direction:column;gap:2px;margin-top:10px;padding:8px 10px;border:2px solid var(--ink);border-radius:10px;background:#fff}
 .yt-now b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .img-prev{width:84px;height:84px;flex:none;border:2.5px solid var(--ink);border-radius:10px;background:#efeaff}
@@ -56,6 +59,15 @@ a.btn{text-decoration:none;color:inherit}
 .yt-way{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-top:8px;padding:10px;border:2px solid var(--ink);border-radius:12px;background:#f7f4ff}
 .yt-way b{font-size:14px}
 .yt-way span{font-size:13px;line-height:1.4}
+.yt-steps{margin:0;padding-left:20px;font-size:13px;line-height:1.45}
+.yt-steps a{color:var(--grape);font-weight:700}
+.yts{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.yts-item{display:flex;gap:10px;align-items:flex-start;width:100%;padding:6px;border:2px solid var(--ink);border-radius:10px;background:#fff;text-align:left;box-shadow:2px 2px 0 var(--ink)}
+.yts-item:active{transform:translate(2px,2px);box-shadow:none}
+.yts-item img,.yts-noimg{width:96px;height:54px;flex:none;object-fit:cover;border-radius:6px;background:#1d1433;display:block}
+.yts-meta{display:flex;flex-direction:column;gap:3px;min-width:0}
+.yts-meta b{font-size:13px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.yts-meta span{font-size:12px;font-weight:600;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* couch view: sitting back, the TV fills the view and a small remote bar replaces the HUD */
 #couchBar{position:fixed;left:0;right:0;margin:0 auto;width:max-content;bottom:calc(12px + var(--sab));z-index:22;display:flex;align-items:center;gap:6px;padding:6px;border:2.5px solid var(--ink);border-radius:18px;background:linear-gradient(180deg,#f7f3ff,#e2dcf7);box-shadow:3px 3px 0 var(--ink);max-width:calc(100vw - 16px)}
 #couchBar[hidden],#couchBar .btn[hidden]{display:none}
@@ -67,7 +79,7 @@ a.btn{text-decoration:none;color:inherit}
 .cb-ch b{font-family:var(--font-term);font-size:21px;font-weight:400;white-space:nowrap}
 .cb-ch span{font-size:11px;font-weight:700;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body.couchview .hud-tl,body.couchview .hud-tr,body.couchview .hud-rail,body.couchview #emoteBar,body.couchview #mini,body.couchview #prompt,body.couchview #useBtn{display:none!important}
-@media (max-width:420px){#couchBar{gap:4px;padding:5px}#couchBar .btn{padding:0 9px;font-size:13px}#couchBar .btn.ic{width:40px}.cb-ch{min-width:40px;max-width:60px}.cb-ch span{display:none}}
+@media (max-width:420px){#couchBar{gap:4px;padding:5px}#couchBar .btn{padding:0 9px;font-size:13px}#couchBar .btn.ic{width:40px}.cb-ch{min-width:40px;max-width:60px}.cb-ch span{display:none}#couchBar.media .cb-ch{display:none}}
 #game canvas{display:block;width:100%;height:100%}
 #scan{position:fixed;inset:0;pointer-events:none;z-index:5;background:repeating-linear-gradient(to bottom,rgba(20,10,40,.07) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
 #vignette{position:fixed;inset:0;pointer-events:none;z-index:4;background:radial-gradient(120% 90% at 50% 45%,transparent 60%,rgba(18,12,36,.35) 100%)}
@@ -491,6 +503,7 @@ body.photo #hud,body.photo #buddyBubble,body.theater #buddyBubble{display:none}
 </style>
 
 <div id="ytHost" class="off"></div>
+<button class="btn" id="fsExit" hidden aria-label="Exit full screen">✕ Exit full screen</button>
 <div id="game" aria-label="3D apartment"></div>
 <div id="vignette"></div>
 <div id="scan" hidden></div>
@@ -541,6 +554,7 @@ body.photo #hud,body.photo #buddyBubble,body.theater #buddyBubble{display:none}
     <button class="btn ic" id="cbNext" aria-label="Channel up"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l10-7z"/></svg></button>
   </div>
   <button class="btn ic primary" id="cbPlay" aria-label="Play" hidden></button>
+  <button class="btn ic" id="cbFull" aria-label="Full screen" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button>
   <button class="btn lilac" id="cbRemote">Remote</button>
   <button class="btn" id="cbUp">Get up</button>
 </div>
@@ -1774,8 +1788,15 @@ const Theater = {
     Radio.emit();
   },
   fullscreen() {
-    const el = TV.channel === 2 && YT.el ? YT.el : Vid.el; if (!(TV.channel === 2 && YT.el) && (TV.channel !== 1 || !Vid.ready())) { toast('Fullscreen works for videos'); return; }
-    const nope = () => toast('Fullscreen is blocked here. Big screen still works.');
+    const yt = TV.channel === 2 && YT.el && YT.state !== 'blocked';
+    if (!yt && (TV.channel !== 1 || !Vid.ready())) { toast('Fullscreen works for videos'); return; }
+    if (yt) {
+      // the real thing where the browser allows it; otherwise (iPhone) the player covers the whole page
+      const el = YT.el, cover = () => YT.full(true);
+      try { if (document.fullscreenEnabled && el.requestFullscreen) { const p = el.requestFullscreen(); if (p && p.catch) p.catch(cover); } else cover(); } catch (e) { cover(); }
+      return;
+    }
+    const el = Vid.el, nope = () => toast('Fullscreen is blocked here. Big screen still works.');
     try {
       if (el.requestFullscreen) { const p = el.requestFullscreen(); if (p && p.catch) p.catch(() => { if (el.webkitEnterFullscreen) el.webkitEnterFullscreen(); else nope(); }); }
       else if (el.webkitEnterFullscreen) el.webkitEnterFullscreen();
@@ -1838,7 +1859,8 @@ function openTV() {
 }
 
 // ---------- realistic TV sound: the farther you walk, the quieter, more muffled and echoey it gets ----------
-const TV_POS = { x: 1.2, y: 0.88, z: -3.42 };
+const TV_POS = { x: 1.2, y: 0.95, z: -3.42 }; // center of the picture tube's glass
+const TV_SCREEN = { w: 1.12, h: 0.63 }; // 16:9, so YouTube and phone videos fill it edge to edge
 // how the TV should sound from where you are right now
 function tvHearing() {
   const S = Store.d.settings;
@@ -2120,13 +2142,13 @@ function quadMatrix(w, hh, p) {
   const t = mm(d, adj(s)); for (let i = 0; i < 9; i++) t[i] /= t[8];
   return `matrix3d(${t[0]},${t[3]},0,${t[6]},${t[1]},${t[4]},0,${t[7]},0,0,1,0,${t[2]},${t[5]},0,${t[8]})`;
 }
-const YT_W = 640, YT_H = 459; // the CRT's shape (0.78 × 0.56)
+const YT_W = 960, YT_H = 540; // 16:9 like the TV's tube; big enough that YouTube streams a sharp picture
 const YT_HOSTS = ['www.youtube-nocookie.com', 'www.youtube.com']; // if a viewer blocks one, try the other
 const YT = {
   el: null, id: null, start: 0, state: 'idle', code: 0, title: '', playing: false, lastActive: false, time: 0, dur: 0,
-  mode: 'tv', hole: null, t0: 0, helloIv: 0, vol: -1, key: '', blockedEver: false, host: 0, autoBig: false,
+  mode: 'tv', hole: null, t0: 0, helloIv: 0, vol: -1, key: '', blockedEver: false, host: 0, autoBig: false, fullOn: false,
   init() {
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(0.78, 0.56), new THREE.MeshBasicMaterial({ color: 0x000000, opacity: 0, transparent: false, blending: THREE.NoBlending }));
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(TV_SCREEN.w, TV_SCREEN.h), new THREE.MeshBasicMaterial({ color: 0x000000, opacity: 0, transparent: false, blending: THREE.NoBlending }));
     m.position.set(TV_POS.x, TV_POS.y, TV_POS.z + 0.003); m.visible = false; m.renderOrder = 1; W.scene.add(m); this.hole = m;
     addEventListener('message', (e) => this.onMsg(e));
     document.addEventListener('securitypolicyviolation', (e) => {
@@ -2135,16 +2157,17 @@ const YT = {
       if (/youtube/.test(u) && !u.includes(YT_HOSTS[this.host])) return; // a late report about the host we already left
       if (/youtube/.test(u) || /frame|child/.test(dir)) this.blocked();
     });
+    $('#fsExit').onclick = () => this.full(false);
     W.updaters.push((dt) => this.frame(dt));
     W.updaters.push((dt) => TVA.update(dt));
   },
   ok() { return this.state === 'ok' || this.state === 'playing'; },
-  load(id, t = 0) {
+  load(id, t = 0, title = '') {
     this.stop(true);
-    this.id = id; this.start = t; this.code = 0; this.title = ''; this.time = t; this.dur = 0; this.playing = false; this.vol = -1; this.host = 0;
+    this.id = id; this.start = t; this.code = 0; this.title = title; this.time = t; this.dur = 0; this.playing = false; this.vol = -1; this.host = 0;
     TV.setChannel(2, true); this.quietOthers(); this.lastActive = true;
     this.mount();
-    this.remember(id, t);
+    this.remember(id, t, title);
     Radio.emit();
   },
   mount() {
@@ -2188,6 +2211,12 @@ const YT = {
     const b = Panel.cur && Panel.cur.body, w = b && b.querySelector('.yt-warn');
     if (w) b.scrollTop += w.getBoundingClientRect().top - b.getBoundingClientRect().top - 8;
   },
+  // full screen that also works on iPhone (Safari there can't put a page element in real fullscreen)
+  full(on) {
+    if (on === this.fullOn) return;
+    this.fullOn = on; $('#fsExit').hidden = !on; document.body.classList.toggle('ytfull', on);
+    Radio.emit();
+  },
   // heading off to YouTube itself: hush the room so the two don't play over each other
   away() { this.quietOthers(); toast('Paused the room\'s music so it won\'t clash'); },
   refreshPanel() { if (Panel.cur && Panel.cur.o.tv && TV.channel === 2) Panel.refresh(); },
@@ -2216,16 +2245,24 @@ const YT = {
   frame() {
     const host = $('#ytHost');
     const live = !!this.el && TV.channel === 2 && this.state !== 'blocked';
-    const big = live && Theater.on;
-    const onTV = live && !Theater.on && this.state !== 'error';
-    const mode = big ? 'big' : onTV ? 'tv' : 'off';
-    if (mode !== this.mode) { this.mode = mode; host.className = mode; this.key = ''; if (mode !== 'big') { host.removeAttribute('style'); } if (this.el && mode !== 'tv') this.el.style.transform = ''; }
+    if (this.fullOn && !live) this.full(false);
+    const full = live && this.fullOn;
+    const big = live && !full && Theater.on;
+    const onTV = live && !full && !Theater.on && this.state !== 'error';
+    const mode = full ? 'full' : big ? 'big' : onTV ? 'tv' : 'off';
+    if (mode !== this.mode) {
+      this.mode = mode; host.className = mode; this.key = ''; if (mode !== 'big') { host.removeAttribute('style'); }
+      if (this.el && mode !== 'tv') this.el.style.transform = '';
+      if (this.el && mode === 'full') { this.el.style.width = '100%'; this.el.style.height = '100%'; }
+    }
     if (this.hole) this.hole.visible = onTV;
     if (big) {
       const r = $('#thScreen').getBoundingClientRect(), key = [r.left, r.top, r.width, r.height].map(Math.round).join(',');
       if (key !== this.key) { this.key = key; Object.assign(host.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' }); this.el.style.width = r.width + 'px'; this.el.style.height = r.height + 'px'; }
     } else if (onTV) {
-      const c = [[-0.39, 0.28], [0.39, 0.28], [0.39, -0.28], [-0.39, -0.28]].map(([x, y]) => new V3(TV_POS.x + x, TV_POS.y + y, TV_POS.z + 0.003).project(W.camera));
+      // a hair larger than the glass (like a real CRT's overscan) so no seam shows at the edges
+      const hw = TV_SCREEN.w / 2 * 1.02, hh2 = TV_SCREEN.h / 2 * 1.02;
+      const c = [[-hw, hh2], [hw, hh2], [hw, -hh2], [-hw, -hh2]].map(([x, y]) => new V3(TV_POS.x + x, TV_POS.y + y, TV_POS.z + 0.003).project(W.camera));
       if (c.some(p => p.z > 1 || p.z < -1)) return;
       const pts = c.map(p => [(p.x + 1) / 2 * innerWidth, (1 - p.y) / 2 * innerHeight]);
       const tr = quadMatrix(YT_W, YT_H, pts);
@@ -2267,14 +2304,109 @@ function ytWays(id, t, refresh) {
       h('span', { text: 'Add the MP4 on channel 1. It plays right on this TV, with room sound.' }),
       h('button', { class: 'btn sm', onclick: () => { TV.setChannel(1); refresh(); } }, 'Go to channel 1')));
 }
+// ---------- YouTube search (website only) ----------
+// Uses the YouTube Data API with the player's own free key, saved in this browser only (never in the page's code).
+// Inside Claude's viewer the page can't reach YouTube at all, so there it points to YouTube's own search instead.
+function decodeEntities(s) { return new DOMParser().parseFromString('<!doctype html><body>' + String(s || ''), 'text/html').body.textContent || ''; }
+async function ytApiSearch(q, pageToken) {
+  let key = '';
+  try { key = localStorage.getItem('dialupden.ytkey') || ''; } catch (e) {}
+  if (!key) throw { need: true };
+  const u = new URL('https://www.googleapis.com/youtube/v3/search');
+  const params = { part: 'snippet', type: 'video', videoEmbeddable: 'true', maxResults: '12', q, key };
+  if (pageToken) params.pageToken = pageToken;
+  for (const k in params) u.searchParams.set(k, params[k]);
+  let r;
+  try { r = await fetch(u); } catch (e) { throw { net: true }; }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { const er = j.error || {}; throw { status: r.status, reason: ((er.errors && er.errors[0] && er.errors[0].reason) || '') + ' ' + (er.status || '') + ' ' + JSON.stringify(er.details || ''), msg: er.message || '' }; }
+  const items = (j.items || []).filter(it => it.id && it.id.videoId && it.snippet).map(it => {
+    const th = it.snippet.thumbnails || {};
+    return { id: it.id.videoId, title: decodeEntities(it.snippet.title), ch: decodeEntities(it.snippet.channelTitle), thumb: (th.medium || th.default || {}).url || '', live: it.snippet.liveBroadcastContent === 'live' };
+  });
+  return { items, next: j.nextPageToken || null };
+}
+// a friendly line for whatever went wrong ('key' = ask for the key again)
+function ytSearchError(e) {
+  if (e && e.need) return 'need';
+  if (!e || e.net) return 'Couldn\'t reach YouTube. Check your connection and try again.';
+  const why = (e.reason || '') + ' ' + (e.msg || '');
+  if (/quota/i.test(why)) return 'Out of YouTube searches for today (Google\'s free limit). Pasting links still works.';
+  if (/keyInvalid|API_KEY_INVALID|API key not valid/i.test(why)) return 'key';
+  if (/REFERRER|referer/i.test(why)) return 'Your key is limited to other websites. In Google Cloud, add ' + location.origin + '/* to the key\'s allowed websites.';
+  if (/accessNotConfigured|SERVICE_DISABLED|has not been used|is disabled/i.test(why)) return 'YouTube Data API v3 isn\'t turned on for your key\'s project yet. Turn it on in Google Cloud, wait a minute, then try again.';
+  return 'YouTube search didn\'t work (' + (e.status || 'error') + '). Try again in a bit.';
+}
+const YTS = {
+  q: '', items: [], next: null, busy: false, err: '',
+  key() { try { return localStorage.getItem('dialupden.ytkey') || ''; } catch (e) { return ''; } },
+  setKey(k) { try { if (k) localStorage.setItem('dialupden.ytkey', k); else localStorage.removeItem('dialupden.ytkey'); } catch (e) { toast('This browser won\'t let the game save the key'); } },
+  async run(q, more) {
+    if (!more) { this.q = q; this.items = []; this.next = null; }
+    this.err = ''; this.busy = true; YT.refreshPanel();
+    try { const r = await ytApiSearch(this.q, more ? this.next : null); this.items = more ? this.items.concat(r.items) : r.items; this.next = r.next; if (!this.items.length) this.err = 'No videos found. Try other words.'; }
+    catch (e) { this.err = ytSearchError(e); }
+    this.busy = false; YT.refreshPanel();
+  },
+};
+// one-time key setup (shown in place of results until there's a key)
+function ytKeyCard(bad) {
+  const ki = h('input', { class: 'inp', id: 'ytKey', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', placeholder: 'Paste your key (starts with AIza)', 'aria-label': 'YouTube API key' });
+  const save = () => {
+    const k = ki.value.trim();
+    if (!/^AIza[\w-]{35}$/.test(k)) { toast('That doesn\'t look like a Google API key. They start with AIza.'); return; }
+    YTS.setKey(k); toast('Key saved in this browser'); if (YTS.q) YTS.run(YTS.q); else YT.refreshPanel();
+  };
+  ki.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); save(); } });
+  const link = (href, text) => h('a', { href, target: '_blank', rel: 'noopener noreferrer' }, text);
+  return h('div', { class: 'yt-way' },
+    h('b', { text: 'Turn on YouTube search (one time)' }),
+    h('span', { text: bad ? 'That key didn\'t work. Check you copied all of it, or make a new one:' : 'YouTube needs a free key from Google. It takes about 5 minutes:' }),
+    h('ol', { class: 'yt-steps' },
+      h('li', {}, 'Open ', link('https://console.cloud.google.com/apis/library/youtube.googleapis.com', 'YouTube Data API v3'), ', make a project if it asks (any name), and tap Enable.'),
+      h('li', {}, 'Open ', link('https://console.cloud.google.com/apis/credentials', 'Credentials'), ', tap Create credentials, then API key, and copy it.'),
+      h('li', {}, 'Paste it here:')),
+    h('div', { class: 'row', style: { flexWrap: 'nowrap', width: '100%' } }, ki, h('button', { class: 'btn sm pink', id: 'ytKeySave', onclick: save }, 'Save')),
+    h('span', { class: 'muted', style: { fontSize: '12px' }, text: 'The key stays in this browser. Tip: in Google Cloud, limit the key to ' + location.origin + '/* so only your site can use it.' }),
+    YTS.q ? h('a', { class: 'btn sm', href: 'https://www.youtube.com/results?search_query=' + encodeURIComponent(YTS.q), target: '_blank', rel: 'noopener noreferrer' }, 'Search on YouTube instead ↗') : null);
+}
+function ytResults(box, watch) {
+  const ytLink = () => h('a', { class: 'btn sm', href: 'https://www.youtube.com/results?search_query=' + encodeURIComponent(YTS.q), target: '_blank', rel: 'noopener noreferrer' }, 'Search on YouTube ↗');
+  if (YTS.err === 'claude') { box.append(h('p', { class: 'yt-warn', text: 'Searching works on the website version of the game. Here you can open the search on YouTube:' }), h('div', { class: 'row' }, ytLink())); return; }
+  if (YTS.err === 'need' || YTS.err === 'key') { box.append(ytKeyCard(YTS.err === 'key')); return; }
+  if (!YTS.q) return;
+  box.append(h('div', { class: 'row', style: { justifyContent: 'space-between', marginTop: '10px' } }, h('div', { class: 'label', text: 'Results for "' + YTS.q + '"' }), h('button', { class: 'btn sm ghost', onclick: () => { YTS.q = ''; YTS.items = []; YTS.err = ''; YT.refreshPanel(); } }, 'Clear')));
+  const list = h('div', { class: 'yts' });
+  YTS.items.forEach(it => list.append(h('button', { class: 'yts-item', onclick: () => watch(it.id, 0, it.title) },
+    it.thumb ? h('img', { src: it.thumb, alt: '', loading: 'lazy', width: 96, height: 54 }) : h('i', { class: 'yts-noimg' }),
+    h('span', { class: 'yts-meta' }, h('b', { text: it.title }), h('span', { text: (it.live ? 'LIVE · ' : '') + it.ch })))));
+  if (YTS.items.length) box.append(list);
+  if (YTS.busy) box.append(h('p', { class: 'muted', style: { margin: '8px 0 0' }, text: 'Searching YouTube…' }));
+  else if (YTS.err) box.append(h('p', { class: 'yt-warn', text: YTS.err }));
+  else if (YTS.next) box.append(h('button', { class: 'btn sm', style: { marginTop: '8px' }, onclick: () => YTS.run(YTS.q, true) }, 'More results'));
+}
+// pick a video anywhere (remote, search, the computer): it goes on the TV.
+// On phones the big screen opens first so you can tap YouTube's own play button (skipped once we know this viewer blocks it).
+function ytWatch(id, t = 0, title = '') { YT.load(id, t, title); if (isTouch && !Theater.on && !YT.blockedEver) { Theater.open(); YT.autoBig = true; } }
+// from the computer: stand up and head to the couch while it starts on the TV
+function ytWatchOnTV(id, title) {
+  PC.exit(); ytWatch(id, 0, title);
+  const couch = W.interact.find(i => i.id === 'couch'); if (couch) useInteractable(couch);
+}
+
 // remote section for channel 2
 function ytRemote(box, refresh) {
-  const inp = h('input', { class: 'inp', id: 'ytLink', type: 'url', inputmode: 'url', autocomplete: 'off', placeholder: 'Paste a YouTube link', 'aria-label': 'YouTube link' });
-  // on phones the big screen lets you tap YouTube's own play button (skipped once we know this viewer blocks it)
-  const watch = (id, t) => { YT.load(id, t); if (isTouch && !Theater.on && !YT.blockedEver) { Theater.open(); YT.autoBig = true; } refresh(); };
-  const go = () => { const p = ytParse(inp.value); if (!p) { toast('That doesn\'t look like a YouTube link'); return; } watch(p.id, p.t); };
+  const inp = h('input', { class: 'inp', id: 'ytLink', type: 'search', enterkeyhint: 'search', autocomplete: 'off', placeholder: 'Paste a link or search YouTube', 'aria-label': 'YouTube link or search', value: YTS.q });
+  const watch = (id, t, title) => { ytWatch(id, t, title); refresh(); };
+  const go = () => {
+    const v = inp.value.trim(); if (!v) return;
+    if (/youtu|\/\//i.test(v)) { const p = ytParse(v); if (p) watch(p.id, p.t); else toast('That doesn\'t look like a YouTube link'); return; }
+    inp.blur(); // let the phone keyboard close
+    if (inClaude()) { YTS.q = v; YTS.items = []; YTS.err = 'claude'; refresh(); return; }
+    YTS.run(v);
+  };
   inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); go(); } });
-  box.append(h('div', { class: 'row', style: { flexWrap: 'nowrap', marginTop: '10px' } }, inp, h('button', { class: 'btn sm pink', id: 'ytGo', onclick: go }, 'Watch')));
+  box.append(h('div', { class: 'row', style: { flexWrap: 'nowrap', marginTop: '10px' } }, inp, h('button', { class: 'btn sm pink', id: 'ytGo', onclick: go }, 'Go')));
   if (YT.id) {
     const st = YT.state;
     const label = YT.title || 'YouTube video';
@@ -2292,10 +2424,11 @@ function ytRemote(box, refresh) {
       box.append(h('p', { class: 'muted', style: { margin: '8px 0 0' }, text: isTouch ? 'If it doesn\'t start, open Big screen and tap YouTube\'s play button, then come back to the TV.' : 'Big screen gives you YouTube\'s own controls. Back on the TV, it plays inside the room.' }), h('div', { class: 'row', style: { marginTop: '6px' } }, openLink));
     }
   } else if (YT.blockedEver) box.append(h('p', { class: 'yt-warn', text: 'Claude\'s viewer blocks YouTube\'s player here. Paste a link anyway and you\'ll get a one-tap way to open it in YouTube.' }));
+  ytResults(box, watch);
   const rec = (Store.d.ytRecent || []).filter(r => r.id !== YT.id);
-  if (rec.length) box.append(h('div', { class: 'label', style: { marginTop: '10px' }, text: 'Recent links' }), ...rec.slice(0, 6).map(r => h('div', { class: 'vtrk' },
-    h('button', { class: 'btn ghost sm grow', onclick: () => watch(r.id, 0) }, '▶ ' + (r.title || 'youtu.be/' + r.id)),
-    h('button', { class: 'btn sm ghost', 'aria-label': 'Forget this link', onclick: () => { Store.d.ytRecent = Store.d.ytRecent.filter(x => x !== r); Store.save(); refresh(); } }, '×'))));
+  if (rec.length) box.append(h('div', { class: 'label', style: { marginTop: '10px' }, text: 'Recent videos' }), ...rec.slice(0, 6).map(r => h('div', { class: 'vtrk' },
+    h('button', { class: 'btn ghost sm grow', onclick: () => watch(r.id, 0, r.title) }, '▶ ' + (r.title || 'youtu.be/' + r.id)),
+    h('button', { class: 'btn sm ghost', 'aria-label': 'Forget this video', onclick: () => { Store.d.ytRecent = Store.d.ytRecent.filter(x => x !== r); Store.save(); refresh(); } }, '×'))));
 }
 
 // ---------- your pictures: wallpaper and clothes from your camera roll (kept on this device) ----------
@@ -2985,15 +3118,16 @@ function buildApartment() {
   S.box(0.08, 0.08, -3.66, 0.06, 0.36, 0.56, 0x2b2440); S.box(2.32, 0.08, -3.66, 0.06, 0.36, 0.56, 0x2b2440);
   S.box(0.6, 0.08, -3.62, 0.42, 0.11, 0.32, 0x8d6cff); S.box(0.6, 0.19, -3.62, 0.38, 0.015, 0.28, 0xb9a6ff, { ol: false }); S.sph(0.45, 0.16, -3.455, 0.012, 0xff4d5e, { glow: true });
   for (let i = 0; i < 7; i++) S.box(1.55 + i * 0.075, 0.08, -3.65, 0.06, 0.2, 0.12, i % 2 ? 0x1d1433 : 0x3b2d63);
-  S.box(1.2, 0.5, -3.7, 0.98, 0.74, 0.52, 0xb9bdd0); S.box(1.2, 0.56, -3.98, 0.7, 0.6, 0.12, 0x9ea3ba);
-  S.box(1.2, 0.5, -3.44, 0.98, 0.74, 0.03, 0x9ea3ba);
-  S.box(0.9, 0.53, -3.42, 0.08, 0.02, 0.01, 0x1d1433, { ol: false }); S.sph(1.6, 0.56, -3.425, 0.014, 0x53ff7a, { glow: true });
+  // big widescreen CRT (16:9 tube)
+  S.box(1.2, 0.5, -3.7, 1.36, 0.86, 0.52, 0xb9bdd0); S.box(1.2, 0.58, -3.98, 0.98, 0.66, 0.12, 0x9ea3ba);
+  S.box(1.2, 0.5, -3.44, 1.36, 0.86, 0.03, 0x9ea3ba);
+  S.box(0.74, 0.55, -3.42, 0.1, 0.02, 0.01, 0x1d1433, { ol: false }); S.sph(1.72, 0.567, -3.425, 0.014, 0x53ff7a, { glow: true });
   // controllers with cords
   S.box(0.75, 0.01, -3.0, 0.16, 0.035, 0.09, 0x8d6cff); S.box(0.95, 0.01, -2.95, 0.16, 0.035, 0.09, 0xff4fae);
   S.box(0.68, 0.005, -3.25, 0.012, 0.01, 0.45, 0x1d1433, { ol: false, ry: 0.2 });
   col(0.02, -3.98, 2.38, -3.36);
-  W.tvTex = canvasTex(320, 240, (g) => { g.fillStyle = '#111'; g.fillRect(0, 0, 320, 240); });
-  const tvs = new THREE.Mesh(new THREE.PlaneGeometry(0.78, 0.56), new THREE.MeshBasicMaterial({ map: W.tvTex })); tvs.position.set(1.2, 0.88, -3.42); sc.add(tvs);
+  W.tvTex = canvasTex(384, 216, (g) => { g.fillStyle = '#111'; g.fillRect(0, 0, 384, 216); });
+  const tvs = new THREE.Mesh(new THREE.PlaneGeometry(TV_SCREEN.w, TV_SCREEN.h), new THREE.MeshBasicMaterial({ map: W.tvTex })); tvs.position.set(TV_POS.x, TV_POS.y, TV_POS.z); sc.add(tvs);
 
   // dance pad
   W.padTex = canvasTex(256, 256, (g) => drawPad(g, [0, 0, 0, 0]));
@@ -4243,7 +4377,7 @@ function setupInput() {
     Input.keys[k] = true;
     if (k === ' ' && Couch.on) { e.preventDefault(); Couch.playPause(); return; }
     if (k === 'e' || k === 'enter' || (k === ' ' && !Panel.cur)) { const it = nearestInteractable(); if (it && !Activity.cur && !Panel.cur) { e.preventDefault(); useInteractable(it); } }
-    if (k === 'escape') { if (Panel.cur) Panel.close(); else if (Activity.cur) Activity.end(); }
+    if (k === 'escape') { if (YT.fullOn) YT.full(false); else if (Panel.cur) Panel.close(); else if (Activity.cur) Activity.end(); }
     if (k === 'q') Cam.tYaw += 0.4; if (k === 'r') Cam.tYaw -= 0.4;
     if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(k) && Activity.cur && !Activity.cur.lock) { Panel.close(); Activity.end(); }
     if (k.startsWith('arrow')) e.preventDefault();
@@ -4994,6 +5128,29 @@ function renderWeb(b, w) {
   if (!hitMix.length && !hitSt.length) page.append(h('p', { style: { color: '#555' }, text: 'No stations or saved songs match. Add your own MP3s in Y2K FM, or try a mood like "chill", "hype" or "sleep".' }));
   const ansBox = h('div', { style: { border: '2px solid #5a3fd1', background: '#f4f0ff', padding: '10px 12px', margin: '14px 0', fontFamily: 'Arial, sans-serif', fontSize: '14px', whiteSpace: 'pre-wrap' } });
   if (Caps.sample) { ansBox.append(h('b', { text: Buddy.name() + ' says: ' }), h('span', { id: 'webAns', text: w.answer || 'Thinking…' })); page.append(ansBox); }
+  // on the website, real YouTube videos show up here and play on the living-room TV (needs the search key, set up on the TV remote)
+  if (!inClaude()) {
+    const yb = h('div', {});
+    page.append(h('div', { style: { fontFamily: 'Arial, sans-serif', fontWeight: '700', fontSize: '15px', margin: '16px 0 8px' }, text: 'Videos on YouTube' }), yb);
+    const show = () => {
+      yb.innerHTML = ''; const r = w.yt;
+      if (r.busy) { yb.append(h('div', { style: { color: '#555' }, text: 'Searching YouTube…' })); return; }
+      if (r.err === 'need' || r.err === 'key') { yb.append(h('div', { style: { color: '#555', fontSize: '14px' }, text: 'To see YouTube videos here, set up search once on the TV remote: sit on the couch, tap Remote, then channel 2.' })); return; }
+      if (r.err) { yb.append(h('div', { style: { color: '#a00', fontSize: '14px' }, text: r.err })); return; }
+      if (!r.items.length) yb.append(h('div', { style: { color: '#555' }, text: 'No videos found.' }));
+      r.items.slice(0, 6).forEach(it => yb.append(h('div', { class: 'web-yt', style: { display: 'flex', gap: '10px', marginBottom: '12px', alignItems: 'flex-start' } },
+        it.thumb ? h('img', { src: it.thumb, alt: '', width: 120, height: 68, loading: 'lazy', style: { width: '120px', height: '68px', objectFit: 'cover', flex: 'none', background: '#222', border: '1px solid #999' } }) : null,
+        h('div', { style: { minWidth: '0' } },
+          h('a', { href: '#', style: { color: '#1a0dab', fontSize: '16px' }, onclick: (e) => { e.preventDefault(); ytWatchOnTV(it.id, it.title); } }, it.title),
+          h('div', { style: { color: '#006621', fontSize: '13px' }, text: 'Plays on your living-room TV' }),
+          h('div', { style: { color: '#555', fontSize: '13px' }, text: (it.live ? 'LIVE · ' : '') + it.ch })))));
+    };
+    if (!w.yt || w.yt.q !== q) {
+      const cur = w.yt = { q, busy: true, items: [], err: '' };
+      ytApiSearch(q).then(r => { cur.items = r.items; }, e => { cur.err = ytSearchError(e); }).then(() => { cur.busy = false; if (w.yt !== cur) return; if (yb.isConnected) show(); else PC.rerender('web'); });
+    }
+    show();
+  }
   page.append(h('p', { style: { fontSize: '13px' } }, h('a', { href: 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q), target: '_blank', rel: 'noopener' }, `Search YouTube for "${q}"`), h('span', { style: { color: '#666' }, text: ' (opens a new tab, outside the apartment)' })));
   async function ask() {
     if (!Caps.sample) return;
@@ -6664,11 +6821,12 @@ const ICO_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l
 const ICO_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
 const Couch = {
   on: false, next: null, _el: null, _r: null, _t: 0, _pp: null,
-  cam: { pos: [1.2, 1.18, -0.25], look: [1.2, 0.86, -3.42], push: false }, // eye height, sitting on the middle seat
+  cam: { pos: [1.2, 1.18, -0.25], look: [TV_POS.x, TV_POS.y, TV_POS.z], push: false }, // eye height, sitting on the middle seat
   init() {
     $('#cbPrev').onclick = () => TV.setChannel(TV.channel - 1);
     $('#cbNext').onclick = () => TV.setChannel(TV.channel + 1);
     $('#cbPlay').onclick = () => this.playPause();
+    $('#cbFull').onclick = () => Theater.fullscreen();
     $('#cbRemote').onclick = () => this.remote();
     $('#cbUp').onclick = () => this.getUp();
     Radio.on(() => this.refresh());
@@ -6696,7 +6854,7 @@ const Couch = {
     $('#cbCh').textContent = 'CH ' + TV.channel;
     const nm = TV.title(); if ($('#cbName').textContent !== nm) $('#cbName').textContent = nm;
     const m = this.media(), pp = !m ? '' : (m === 'vid' ? Vid.playing : YT.playing) ? 'pause' : 'play';
-    if (pp !== this._pp) { this._pp = pp; const b = $('#cbPlay'); b.hidden = !pp; b.innerHTML = pp === 'pause' ? ICO_PAUSE : ICO_PLAY; b.setAttribute('aria-label', pp === 'pause' ? 'Pause' : 'Play'); }
+    if (pp !== this._pp) { this._pp = pp; const b = $('#cbPlay'); b.hidden = !pp; b.innerHTML = pp === 'pause' ? ICO_PAUSE : ICO_PLAY; b.setAttribute('aria-label', pp === 'pause' ? 'Pause' : 'Play'); $('#cbFull').hidden = !pp; $('#couchBar').classList.toggle('media', !!pp); }
   },
   remote(tab) { if (tab) Acts._couchTab = tab; couchPanel(); },
   getUp() { if (Panel.cur) Panel.close(true); Theater.close(); Activity.end(); },
@@ -6711,16 +6869,16 @@ const Couch = {
     R = Math.max(L + 160, R); B = Math.max(T + 120, B);
     const fw = (R - L) / innerWidth, fh = (B - T) / innerHeight, aspect = innerWidth / innerHeight;
     const P = this.cam.pos, K = this.cam.look, d = Math.hypot(P[0] - K[0], P[1] - K[1], P[2] - K[2]);
-    // the TV cabinet is about 0.98 × 0.74 m: fill ~70% of the free height or ~90% of its width, whichever runs out first
-    const t = Math.max((0.40 / d) / (0.70 * fh), (0.50 / d) / (0.90 * fw * aspect));
-    return { tx: innerWidth / 2 - (L + R) / 2, ty: innerHeight / 2 - (T + B) / 2, fov: clamp(2 * Math.atan(t) * 180 / Math.PI, 12, 50) };
+    // the TV cabinet is about 1.36 × 0.86 m: fill ~70% of the free height or ~90% of its width, whichever runs out first
+    const t = Math.max((0.45 / d) / (0.70 * fh), (0.70 / d) / (0.90 * fw * aspect));
+    return { tx: innerWidth / 2 - (L + R) / 2, ty: innerHeight / 2 - (T + B) / 2, fov: clamp(2 * Math.atan(t) * 180 / Math.PI, 12, 70) };
   },
 };
 // sharper TV picture while you're watching up close
 function tvHiRes(on) {
   const cv = W.tvTex && W.tvTex.image; if (!cv) return;
-  const w = on ? 640 : 320; if (cv.width === w) return;
-  cv.width = w; cv.height = on ? 480 : 240; tvT = 1;
+  const w = on ? 768 : 384; if (cv.width === w) return;
+  cv.width = w; cv.height = on ? 432 : 216; tvT = 1;
 }
 
 // ---------- visual effects: weather, fireflies, shooting stars, party mode, confetti, halos, rim light ----------
