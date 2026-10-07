@@ -4867,7 +4867,7 @@ const Menus = {
 const Caps = { sample: null, tools: false };
 async function resolveCaps() {
   try {
-    if (!window.claude || !window.claude.use) return;
+    if (!window.claude || !window.claude.use) { useClaudeKey(); return; } // a regular website: the player's own API key, if saved
     const s = await window.claude.use('sample');
     if (!s) return;
     Caps.sample = s;
@@ -4881,6 +4881,12 @@ function sampleErr(e) {
   if (c === 'session_expired') return 'Sign in to Claude again to keep chatting.';
   if (c === 'refused') return Buddy.name() + ' can\'t help with that one.';
   if (c === 'cancelled') return '';
+  if (c === 'api_key') return 'That Claude API key didn\'t work. You can change it in ' + Buddy.name() + '\'s Customize tab.';
+  if (c === 'api_credit') return 'Your Claude API account is out of credit. Add some in the Claude Console under Billing.';
+  if (c === 'api_workspace') return 'That key covers more than one workspace. Make a new key with its workspace set to Default.';
+  if (c === 'api_busy') return 'Claude is busy right now. Try again in a moment.';
+  if (c === 'api_model') return 'That brain isn\'t available on your Claude account yet. Try the Quick brain.';
+  if (c === 'network') return 'Couldn\'t reach Claude. Check your connection.';
   return 'Connection dropped (very 1999). Try again.';
 }
 
@@ -5280,9 +5286,131 @@ STUDIO
 YOUR BUDDY
   Tap the robot (or the robot button) to chat, do tricks,
   or rename and recolor it. Emotes + photo mode are on the
-  right edge. Decorate + weather live in the ≡ menu.
+  right edge. Decorate + weather live in the ≡ menu.${inClaude() ? '' : `
+  On this website, chat runs on your own Claude API key;
+  your buddy walks you through adding one.`}
 `;
   b.append(h('pre', { style: { margin: 0, padding: '12px', fontFamily: 'var(--font-term)', fontSize: '19px', lineHeight: '1.15', whiteSpace: 'pre-wrap' }, text: txt }));
+}
+
+// ---------- SmartBuddy on a regular website: the player's own Claude API key ----------
+// Claude logins only work inside Claude's own apps (Anthropic doesn't allow other sites to offer them), so on the
+// website the buddy runs on an API key from the Claude Console. The key stays in this browser and is only ever
+// sent to Anthropic's API. claudeApiSample() has the same shape as Claude's built-in `sample`, so the buddy chat,
+// its apartment tools, DenSearch answers and recipe ideas all work unchanged.
+const CLAUDE_API = 'https://api.anthropic.com/v1/';
+const BRAIN_MODELS = { quick: ['claude-haiku-5-5', 'claude-haiku-4-5'], default: ['claude-sonnet-5-5'], complex: ['claude-opus-5-5'] };
+const BRAIN_NAMES = { quick: 'Claude Haiku 5.5', default: 'Claude Sonnet 5.5', complex: 'Claude Opus 5.5' };
+const ClaudeKey = {
+  get() { try { return localStorage.getItem('dialupden.claudekey') || ''; } catch (e) { return ''; } },
+  set(k) { try { if (k) localStorage.setItem('dialupden.claudekey', k); else localStorage.removeItem('dialupden.claudekey'); return true; } catch (e) { return false; } },
+};
+function claudeHeaders(key) { return { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true', 'content-type': 'application/json' }; }
+// API error -> the same {code, message} shape the buddy already handles
+function claudeApiError(status, j) {
+  const er = (j && j.error) || {}, msg = String(er.message || ''), type = String(er.type || '');
+  if (status === 401 || status === 403 || type === 'authentication_error' || type === 'permission_error') return { code: 'api_key', message: msg };
+  if (/credit balance|billing/i.test(msg)) return { code: 'api_credit', message: msg };
+  if (/workspace/i.test(msg)) return { code: 'api_workspace', message: msg };
+  if (status === 429 || type === 'rate_limit_error') return { code: 'rate_limited', message: msg };
+  if (status === 529 || status >= 500 || type === 'overloaded_error' || type === 'api_error') return { code: 'api_busy', message: msg };
+  if (status === 404 || type === 'not_found_error') return { code: 'api_model', message: msg };
+  return { code: 'api_error', message: msg || 'HTTP ' + status };
+}
+// is this key good? (listing models costs nothing)
+async function claudeKeyCheck(key) {
+  let r; try { r = await fetch(CLAUDE_API + 'models?limit=1', { headers: claudeHeaders(key) }); } catch (e) { throw { code: 'network' }; }
+  if (r.ok) return true;
+  throw claudeApiError(r.status, await r.json().catch(() => ({})));
+}
+function claudeApiSample() {
+  const call = async (input, opts = {}) => {
+    const key = ClaudeKey.get(); if (!key) throw { code: 'api_key', message: 'No key saved' };
+    const tier = BRAIN_MODELS[opts.modelTier] ? opts.modelTier : 'quick';
+    const models = BRAIN_MODELS[tier].slice();
+    let effort = tier === 'quick'; // the Quick brain answers fast and cheap
+    const msgs = typeof input === 'string' ? [{ role: 'user', content: input }] : input.map(t => ({ role: t.role, content: t.content }));
+    const tools = opts.tools && opts.tools.length ? opts.tools : null;
+    const apiTools = tools && tools.map(t => ({ name: t.name, description: t.description || '', input_schema: t.inputSchema || { type: 'object', properties: {} } }));
+    let all = '', tries = 0;
+    for (let round = 0; round < 6;) {
+      const body = { model: models[0], max_tokens: 2048, messages: msgs };
+      if (apiTools) body.tools = apiTools;
+      if (effort) body.output_config = { effort: 'low' };
+      let r;
+      try { r = await fetch(CLAUDE_API + 'messages', { method: 'POST', headers: claudeHeaders(key), body: JSON.stringify(body), signal: opts.signal }); }
+      catch (e) { throw { code: e && e.name === 'AbortError' ? 'cancelled' : 'network', text: all }; }
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        const er = claudeApiError(r.status, j);
+        // a model this account can't use yet -> the next one down; an option this model doesn't take -> drop it
+        if (tries < 3 && er.code === 'api_model' && models.length > 1) { tries++; models.shift(); effort = false; continue; }
+        if (tries < 3 && r.status === 400 && effort && /effort|output_config/i.test(er.message)) { tries++; effort = false; continue; }
+        er.text = all; throw er;
+      }
+      round++;
+      const content = Array.isArray(j.content) ? j.content : [];
+      const text = content.filter(b => b.type === 'text').map(b => b.text).join('').trim();
+      if (text) { all = all ? all + ' ' + text : text; if (opts.onText) { try { opts.onText({ text: all, delta: text }); } catch (e) {} } }
+      const uses = content.filter(b => b.type === 'tool_use');
+      if (j.stop_reason === 'tool_use' && uses.length && tools) {
+        msgs.push({ role: 'assistant', content }); // as returned, thinking blocks included
+        const results = [];
+        for (const u of uses) {
+          const t = tools.find(x => x.name === u.name); let out, bad = false;
+          try { out = t ? await t.execute(u.input || {}) : 'There is no tool called ' + u.name; } catch (e) { out = String((e && e.message) || e); bad = true; }
+          results.push(Object.assign({ type: 'tool_result', tool_use_id: u.id, content: typeof out === 'string' ? out : JSON.stringify(out == null ? '' : out) }, bad ? { is_error: true } : {}));
+        }
+        msgs.push({ role: 'user', content: results });
+        continue;
+      }
+      if (j.stop_reason === 'refusal' && !all) throw { code: 'refused' };
+      return { text: all, truncated: j.stop_reason === 'max_tokens', modelTierApplied: tier };
+    }
+    return { text: all, truncated: false, modelTierApplied: tier };
+  };
+  call.json = async (input, opts) => { const { text } = await call(input, opts); const m = text.match(/[[{][\s\S]*[\]}]/); return JSON.parse(m ? m[0] : text); };
+  call.limits = async () => ({ tools: { maxCount: 32 }, images: false });
+  return call;
+}
+// website: the buddy's brain comes from the saved key (inside Claude, resolveCaps uses Claude's own)
+function useClaudeKey() {
+  if (inClaude()) return;
+  const on = !!ClaudeKey.get();
+  Caps.sample = on ? claudeApiSample() : null; Caps.tools = on; Caps.toolMax = on ? 32 : 0; Caps.viaKey = on;
+}
+// the one-time setup card
+function claudeKeyCard(after) {
+  const nm = Buddy.name();
+  const link = (href, text) => h('a', { href, target: '_blank', rel: 'noopener noreferrer' }, text);
+  const ki = h('input', { class: 'inp', id: 'claudeKey', type: 'password', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', placeholder: 'sk-ant-…', 'aria-label': 'Claude API key' });
+  const status = h('span', { class: 'muted', id: 'claudeKeyStatus', style: { fontSize: '12px' } });
+  const save = async () => {
+    const k = ki.value.trim();
+    if (!/^sk-ant-[\w-]{20,}$/.test(k)) { toast('That doesn\'t look like a Claude API key. They start with sk-ant-'); return; }
+    btn.disabled = true; status.textContent = 'Checking the key…';
+    try { await claudeKeyCheck(k); }
+    catch (e) {
+      btn.disabled = false;
+      status.textContent = e.code === 'network' ? 'Couldn\'t reach Claude. Check your connection and try again.' : e.code === 'api_workspace' ? 'That key covers more than one workspace. Make a new key and set its workspace to Default.' : 'That key didn\'t work. Check you copied all of it, or make a new one.';
+      return;
+    }
+    if (!ClaudeKey.set(k)) { btn.disabled = false; status.textContent = 'This browser won\'t let the game save the key.'; return; }
+    useClaudeKey(); toast('<b>' + esc(nm.toUpperCase()) + ' IS ONLINE</b> Say hi!');
+    if (after) after();
+  };
+  const btn = h('button', { class: 'btn sm pink', id: 'claudeKeySave', onclick: save }, 'Save');
+  ki.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); save(); } });
+  return h('div', { class: 'yt-way' },
+    h('b', { text: 'Give ' + nm + ' a brain' }),
+    h('span', { text: 'Claude logins only work inside Claude\'s own apps, so on your website ' + nm + ' runs on a Claude API key. It\'s pay-as-you-go and separate from a Claude plan.' }),
+    h('ol', { class: 'yt-steps' },
+      h('li', {}, 'Open the ', link('https://platform.claude.com/settings/keys', 'Claude Console'), ' and sign in or make an account. New accounts get a little free credit.'),
+      h('li', {}, 'Tap Create key, set the workspace to Default, and copy the key. It starts with sk-ant-.'),
+      h('li', {}, 'Paste it here:')),
+    h('div', { class: 'row', style: { flexWrap: 'nowrap', width: '100%' } }, ki, btn),
+    status,
+    h('span', { class: 'muted', style: { fontSize: '12px' }, text: 'Saved only in this browser and sent only to Claude. The Quick brain costs a tiny fraction of a cent per message. Tip: set a spend limit in the Console.' }));
 }
 
 // ---------- minigames ----------
@@ -5990,11 +6118,14 @@ const Buddy = {
   },
   // --- panel ---
   open() {
-    Panel.open({ title: this.name(), sub: Caps.sample ? 'Your robot pal · tap a tab' : 'Your robot pal (chat needs a signed-in Claude viewer)', acc: this.col(), collapsible: true, endsActivity: false, cls: 'tall', buddy: true,
+    Panel.open({ title: this.name(), sub: Caps.sample ? 'Your robot pal · tap a tab' : inClaude() ? 'Your robot pal (chat needs a signed-in Claude viewer)' : 'Your robot pal (chat needs a Claude API key)', acc: this.col(), collapsible: true, endsActivity: false, cls: 'tall', buddy: true,
       body: (b) => {
         const tab = Buddy._tab || 'chat';
         b.append(h('div', { class: 'tabs' }, [['chat', 'Chat'], ['tricks', 'Tricks'], ['look', 'Customize']].map(([k, t]) => h('button', { class: 'btn sm' + (tab === k ? ' lime' : ''), onclick: () => { Buddy._tab = k; Panel.refresh(); } }, t))));
-        if (tab === 'chat') { const box = h('div', { class: 'bchat' }); b.append(box); buddyChat(box, 'panel'); return; }
+        if (tab === 'chat') {
+          if (!Caps.sample && !inClaude()) { b.append(claudeKeyCard(() => Buddy.open())); return; } // website without a key yet
+          const box = h('div', { class: 'bchat' }); b.append(box); buddyChat(box, 'panel'); return;
+        }
         if (tab === 'tricks') {
           const T = [['dance', 'Dance'], ['spin', 'Spin'], ['flip', 'Backflip'], ['confetti', 'Confetti'], ['zoom', 'Zoom around'], ['glow', 'Rainbow glow'], ['nap', 'Power nap']];
           b.append(card('Buddy tricks', h('div', { class: 'grid3' }, T.map(([k, t]) => h('button', { class: 'btn sm', onclick: () => Buddy.doTrick(k) }, t)))));
@@ -6008,9 +6139,12 @@ const Buddy = {
         b.append(h('label', { class: 'field' }, 'Name', h('input', { class: 'inp', id: 'buddyName', maxlength: 20, value: B.name, onchange: (e) => { B.name = e.target.value.trim().slice(0, 20) || 'SmartBuddy'; Store.save(); Panel.cur.el.querySelector('.panel-head h2').textContent = Buddy.name(); } })));
         b.append(h('div', { class: 'label', text: 'Color' }), h('div', { class: 'swatches' }, Object.entries(BUDDY_COLORS).map(([k, c]) => h('button', { class: 'sw' + (B.color === k ? ' on' : ''), style: { background: c }, 'aria-label': k, onclick: () => { B.color = k; Store.save(); Buddy.build(); Panel.refresh(); } }))));
         b.append(h('div', { class: 'label', text: 'Personality' }), h('div', { class: 'opts' }, Object.entries(BUDDY_VIBES).map(([k, v]) => h('button', { class: 'opt' + (B.vibe === k ? ' on' : ''), onclick: () => { B.vibe = k; Store.save(); Panel.refresh(); } }, v.name))));
-        b.append(card('Brain', h('p', { class: 'muted', style: { margin: '0 0 8px' }, text: 'Chat runs on Claude through your own Claude account. Pick how hard it thinks:' }),
+        const web = !inClaude();
+        if (web && !ClaudeKey.get()) b.append(card('Brain', claudeKeyCard(() => Buddy.open())));
+        else b.append(card('Brain', h('p', { class: 'muted', style: { margin: '0 0 8px' }, text: web ? 'Chat runs on Claude with your own API key, billed to your Claude Console account. Pick how hard it thinks:' : 'Chat runs on Claude through your own Claude account. Pick how hard it thinks:' }),
           h('div', { class: 'stack', style: { gap: '6px' } }, Object.entries(BRAINS).map(([k, v]) => h('button', { class: 'btn sm' + (B.tier === k ? ' lime' : ''), style: { justifyContent: 'space-between' }, onclick: () => { B.tier = k; Store.save(); Panel.refresh(); } }, h('b', { text: v.name }), h('span', { class: 'muted', style: { fontSize: '12px' }, text: v.note })))),
-          h('p', { class: 'muted', style: { margin: '8px 0 0' }, text: Buddy.lastTier ? `Last reply came from the ${BRAINS[Buddy.lastTier] ? BRAINS[Buddy.lastTier].name : Buddy.lastTier} brain.` + (Buddy.lastTier !== B.tier ? ' Your plan picked that one.' : '') : 'Claude picks the exact model for each brain level.' })));
+          h('p', { class: 'muted', style: { margin: '8px 0 0' }, text: web ? Object.keys(BRAINS).map(k => BRAINS[k].name + ' = ' + BRAIN_NAMES[k]).join(' · ') : Buddy.lastTier ? `Last reply came from the ${BRAINS[Buddy.lastTier] ? BRAINS[Buddy.lastTier].name : Buddy.lastTier} brain.` + (Buddy.lastTier !== B.tier ? ' Your plan picked that one.' : '') : 'Claude picks the exact model for each brain level.' }),
+          web ? h('div', { class: 'row', style: { marginTop: '8px' } }, h('button', { class: 'btn sm', id: 'claudeKeyRemove', onclick: () => { ClaudeKey.set(''); useClaudeKey(); Chat.turns = []; Buddy.open(); toast('Key removed from this browser'); } }, 'Remove API key')) : null));
         b.append(h('div', { class: 'label', text: 'Behavior' }), h('div', { class: 'opts' },
           h('button', { class: 'opt' + (B.follow !== false ? ' on' : ''), onclick: () => { B.follow = B.follow === false; if (!B.follow) Buddy.home = [Player.x, Player.z]; Store.save(); Panel.refresh(); } }, B.follow !== false ? 'Follows me' : 'Stays put'),
           h('button', { class: 'opt' + (B.chatty ? ' on' : ''), onclick: () => { B.chatty = !B.chatty; Store.save(); Panel.refresh(); } }, B.chatty ? 'Chatty' : 'Quiet')));
@@ -6029,7 +6163,7 @@ function buddyChat(b, where) {
   const sendB = h('button', { class: 'osbtn big', onclick: () => Chat.busy ? Chat.ctl && Chat.ctl.abort() : send(), disabled: !Caps.sample }, Chat.busy ? 'Stop' : 'Send');
   wrap.append(head, log, h('div', { class: 'im-in' }, ta, sendB));
   const line = (who, text, cls) => { const m = h('div', { class: 'm ' + cls }); if (who) m.append(h('b', { text: who + ': ' })); const p = h('p', { text }); m.append(p); log.append(m); log.scrollTop = log.scrollHeight; return p; };
-  if (!Caps.sample) line('', `Away message: "brb, saving the world from Y2K." ${nm} needs a signed-in Claude viewer to chat. Tricks and everything else still work.`, 'sys');
+  if (!Caps.sample) line('', `Away message: "brb, saving the world from Y2K." ${nm} ${inClaude() ? 'needs a signed-in Claude viewer to chat' : 'needs a Claude API key to chat. Tap ' + nm + ' in the room to add one'}. Tricks and everything else still work.`, 'sys');
   else if (!Chat.turns.length) line(nm, 'heyyy ' + Store.d.screenName + '! i can switch the music, start a timer, add to-dos, change the weather, throw a party, paint your walls, walk you places, or just talk. what\'s up?', 'bot');
   Chat.turns.forEach(t => line(t.role === 'user' ? Store.d.screenName : nm, t.content, t.role === 'user' ? 'me' : 'bot'));
   if (Caps.sample && !Chat.turns.length) {
