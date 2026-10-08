@@ -78,8 +78,47 @@ a.btn{text-decoration:none;color:inherit}
 .cb-ch{display:flex;flex-direction:column;justify-content:center;min-width:44px;max-width:150px;padding:0 4px;line-height:1.05}
 .cb-ch b{font-family:var(--font-term);font-size:21px;font-weight:400;white-space:nowrap}
 .cb-ch span{font-size:11px;font-weight:700;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-body.couchview .hud-tl,body.couchview .hud-tr,body.couchview .hud-rail,body.couchview #emoteBar,body.couchview #mini,body.couchview #prompt,body.couchview #useBtn{display:none!important}
-@media (max-width:420px){#couchBar{gap:4px;padding:5px}#couchBar .btn{padding:0 9px;font-size:13px}#couchBar .btn.ic{width:40px}.cb-ch{min-width:40px;max-width:60px}.cb-ch span{display:none}#couchBar.media .cb-ch{display:none}}
+body.couchview .hud-tl > :not(#partyPill),body.couchview .hud-tr,body.couchview .hud-rail,body.couchview #emoteBar,body.couchview #mini,body.couchview #prompt,body.couchview #useBtn{display:none!important}
+@media (max-width:420px){#couchBar{gap:4px;padding:5px}#couchBar .btn{padding:0 9px;font-size:13px}#couchBar .btn.ic{width:40px}.cb-ch{min-width:40px;max-width:60px}.cb-ch span{display:none}#couchBar.media .cb-ch{display:none}#couchBar.party .cb-tune{display:none}}
+/* watch party: room pill, reactions tray over the couch bar, floating emoji, the party panel */
+.party-chip{display:flex;align-items:center;gap:7px;padding:3px 12px 3px 8px;border:2.5px solid var(--ink);border-radius:999px;background:var(--bubble);color:#fff;box-shadow:3px 3px 0 var(--ink);font-family:var(--font-term);font-size:21px;line-height:1.1;white-space:nowrap;position:relative}
+.party-chip[hidden]{display:none}
+.party-chip::before{content:"";width:10px;height:10px;flex:none;border-radius:50%;background:var(--lime);border:2px solid var(--ink)}
+.party-chip.unread::after{content:"";position:absolute;top:-5px;right:-5px;width:13px;height:13px;border-radius:50%;background:#ffd400;border:2px solid var(--ink)}
+#couchBar .btn.on{background:var(--lime)}
+#reactTray{position:fixed;left:0;right:0;margin:0 auto;width:max-content;max-width:calc(100vw - 16px);bottom:calc(74px + var(--sab));z-index:22;display:flex;align-items:center;gap:6px;padding:6px;border:2.5px solid var(--ink);border-radius:16px;background:linear-gradient(180deg,#fff,#ffe3f3);box-shadow:3px 3px 0 var(--ink)}
+#reactTray[hidden]{display:none}
+#reactTray .btn{flex:none;height:42px;min-height:42px;padding:0 12px;border-radius:12px;box-shadow:2px 2px 0 var(--ink);font-size:14px}
+#reactTray .btn.ic{width:42px;padding:0;font-size:22px}
+@media (max-width:420px){#reactTray{gap:4px;padding:5px}#reactTray .btn.ic{width:38px;font-size:20px}#reactTray .btn{padding:0 9px}}
+#partyFx{position:fixed;inset:0;pointer-events:none;z-index:74;overflow:hidden}
+.pfloat{position:absolute;bottom:calc(120px + var(--sab));display:flex;flex-direction:column;align-items:center;gap:2px;animation:pfloat 2.6s ease-out forwards}
+.pfloat .pe{font-size:40px;line-height:1;filter:drop-shadow(2px 2px 0 var(--ink))}
+.pfloat small{font-size:11px;font-weight:700;color:#fff;background:var(--ink);padding:1px 7px;border-radius:999px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@keyframes pfloat{0%{transform:translate(-50%,24px) scale(.5);opacity:0}12%{transform:translate(-50%,0) scale(1.15);opacity:1}70%{opacity:1}100%{transform:translate(calc(-50% + var(--dx,0px)),-42vh) scale(1);opacity:0}}
+@keyframes pfade{0%,75%{opacity:1;transform:translate(-50%,-14vh)}100%{opacity:0;transform:translate(-50%,-14vh)}}
+@media (prefers-reduced-motion:reduce){.pfloat{animation:pfade 2.6s linear forwards!important}}
+body.ytfull #toasts{z-index:75}
+.panel-foot:empty{display:none}
+.party-room{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;border:2.5px solid var(--ink);border-radius:14px;background:linear-gradient(180deg,#fff,#ffe3f3);text-align:center}
+.pr-lcd{display:flex;align-items:baseline;justify-content:center;gap:12px;align-self:stretch;padding:6px 12px;border-radius:10px;background:#1c0b16;color:#ff3b6b;font-family:var(--font-term);text-shadow:0 0 6px rgba(255,59,107,.7)}
+.pr-lcd span{font-size:18px;letter-spacing:.12em}
+.pr-lcd b{font-size:46px;font-weight:400;line-height:1;letter-spacing:.14em}
+.party-link{font-size:12px;font-weight:600;color:var(--grape);overflow-wrap:anywhere;user-select:all;-webkit-user-select:all}
+.party-now .pn-title{display:block;margin:2px 0;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.party-now .yt-warn{margin-top:8px}
+.party-who{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.party-who .chip i{width:9px;height:9px;flex:none;border-radius:50%;background:var(--ok);border:1.5px solid var(--ink)}
+.party-who .chip.me{background:var(--lime)}
+.party-who .chip.away{opacity:.65}
+.party-who .chip.away i{background:#c9c0e8}
+.party-react{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.party-react .btn{padding:0;min-height:44px;font-size:22px}
+.party-chat{display:flex;flex-direction:column;gap:8px}
+.party-log{height:150px;overflow:auto;padding:8px 10px;border:2.5px solid var(--ink);border-radius:12px;background:#fff;display:flex;flex-direction:column;gap:4px;font-size:14px;line-height:1.35}
+.party-log .pm{overflow-wrap:anywhere}
+.party-log .pm b{color:var(--grape)}
+.party-log .pm.me b{color:#c4001d}
 #game canvas{display:block;width:100%;height:100%}
 #scan{position:fixed;inset:0;pointer-events:none;z-index:5;background:repeating-linear-gradient(to bottom,rgba(20,10,40,.07) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
 #vignette{position:fixed;inset:0;pointer-events:none;z-index:4;background:radial-gradient(120% 90% at 50% 45%,transparent 60%,rgba(18,12,36,.35) 100%)}
@@ -520,6 +559,7 @@ body.photo #hud,body.photo #buddyBubble,body.theater #buddyBubble{display:none}
       <span class="orb"></span><span><span id="vibesNum" class="num">0</span> vibes · Lv <span id="vibesLv">1</span></span><span class="bar"><i id="vibesBar"></i></span>
     </button>
     <button class="focus-chip num" id="focusChip" hidden aria-label="Focus timer"></button>
+    <button class="party-chip num" id="partyPill" hidden aria-label="Watch party"></button>
   </div>
   <div class="hud-rail">
     <button class="btn iconbtn" id="btnBuddy" aria-label="Talk to your buddy" title="Buddy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="7"/><path d="M12 6V3"/><circle cx="12" cy="2.5" r="1.2" fill="currentColor"/><path d="M9 12.5h.01M15 12.5h.01" stroke-width="3"/><path d="M9.5 15.5c1.4 1 3.6 1 5 0"/></svg></button>
@@ -555,11 +595,14 @@ body.photo #hud,body.photo #buddyBubble,body.theater #buddyBubble{display:none}
   </div>
   <button class="btn ic primary" id="cbPlay" aria-label="Play" hidden></button>
   <button class="btn ic" id="cbFull" aria-label="Full screen" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button>
+  <button class="btn ic pink" id="cbParty" aria-label="Watch party reactions" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8 14.5c2.2 2.4 5.8 2.4 8 0"/><path d="M9 9.5h.01M15 9.5h.01" stroke-width="3.2"/></svg></button>
   <button class="btn lilac" id="cbRemote">Remote</button>
   <button class="btn" id="cbUp">Get up</button>
 </div>
+<div id="reactTray" hidden role="toolbar" aria-label="Reactions"></div>
 
 <div id="toasts" aria-live="polite"></div>
+<div id="partyFx" aria-hidden="true"></div>
 <div id="panelWrap"></div>
 
 <div id="beat"><canvas id="beatCv"></canvas>
@@ -663,13 +706,13 @@ function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<'
 function money(n) { return (n < 0 ? '-$' : '$') + Math.abs(n).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 }); }
 
 // toasts
-function toast(msg, kind) {
+function toast(msg, kind, ms = 2600) {
   const box = $('#toasts');
   const t = h('div', { class: 'toast' + (kind ? ' ' + kind : '') });
   if (typeof msg === 'string') t.innerHTML = msg; else t.append(msg);
   box.append(t);
   while (box.children.length > 3) box.firstChild.remove();
-  setTimeout(() => { t.style.transition = 'opacity .4s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 450); }, 2600);
+  setTimeout(() => { t.style.transition = 'opacity .4s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 450); }, ms);
 }
 
 // copy helper (clipboard may be refused)
@@ -702,6 +745,7 @@ const ICO = {
   vibes: '<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="#ff4fae" stroke="#1d1433" stroke-width="2.5"/><path d="M20 9l3 7 7 .5-5.5 4.5 2 7L20 24l-6.5 4 2-7L10 16.5l7-.5z" fill="#fff47a" stroke="#1d1433" stroke-width="2" stroke-linejoin="round"/></svg>',
   web: '<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="#22d1e6" stroke="#1d1433" stroke-width="2.5"/><path d="M5 20h30M20 5c-8 8-8 22 0 30M20 5c8 8 8 22 0 30" stroke="#1d1433" stroke-width="2" fill="none"/><circle cx="29" cy="29" r="7" fill="#fff" stroke="#1d1433" stroke-width="2.5"/><path d="M34 34l4 4" stroke="#1d1433" stroke-width="3"/></svg>',
   power: '<svg viewBox="0 0 40 40"><circle cx="20" cy="21" r="13" fill="none" stroke="#ff4d5e" stroke-width="4"/><path d="M20 5v14" stroke="#ff4d5e" stroke-width="4" stroke-linecap="round"/></svg>',
+  party: '<svg viewBox="0 0 40 40"><path d="M14 13l6-6 6 6" stroke="#1d1433" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="13" width="34" height="23" rx="4" fill="#a99bff" stroke="#1d1433" stroke-width="2.5"/><rect x="7" y="17" width="21" height="15" rx="2" fill="#1d1433"/><path d="M15 20.5v8l6.5-4z" fill="#ff4fae"/><circle cx="32.5" cy="20.5" r="1.8" fill="#1d1433"/><circle cx="32.5" cy="27" r="1.8" fill="#1d1433"/><circle cx="6" cy="6" r="2.2" fill="#ffd400" stroke="#1d1433" stroke-width="1.2"/><circle cx="34" cy="5" r="2.2" fill="#22d1e6" stroke="#1d1433" stroke-width="1.2"/><path d="M28 3.5l1 2.5M11 3l-1 2.5" stroke="#ff4fae" stroke-width="2" stroke-linecap="round"/></svg>',
   mixtape: '<svg viewBox="0 0 40 40"><rect x="3" y="9" width="34" height="22" rx="3" fill="#1d1433"/><rect x="7" y="12" width="26" height="10" rx="2" fill="#fff47a"/><circle cx="13" cy="24" r="4" fill="#fff"/><circle cx="27" cy="24" r="4" fill="#fff"/><path d="M13 24h14" stroke="#fff" stroke-width="2"/><text x="20" y="20" font-size="6" text-anchor="middle" fill="#1d1433" font-family="Arial" font-weight="700">MIX</text></svg>',
 };
 const MOODFACE = (i) => {
@@ -1843,7 +1887,9 @@ function tvRemote(b, refresh) {
   }
   box.append(h('div', { class: 'row', style: { marginTop: '10px' } },
     h('button', { class: 'btn sm lilac', id: 'bigScreenBtn', onclick: () => { Theater.on ? Theater.close() : Theater.open(); refresh(); } }, Theater.on ? 'Exit big screen' : 'Big screen'),
-    (TV.channel === 1 && Vid.current()) || (TV.channel === 2 && YT.el) ? h('button', { class: 'btn sm', onclick: () => Theater.fullscreen() }, 'Fullscreen') : null));
+    (TV.channel === 1 && Vid.current()) || (TV.channel === 2 && YT.el) ? h('button', { class: 'btn sm', onclick: () => Theater.fullscreen() }, 'Fullscreen') : null,
+    TV.channel === 2 || WatchParty.room ? h('button', { class: 'btn sm pink', id: 'tvParty', onclick: () => WatchParty.open() }, WatchParty.room ? 'Party ' + WatchParty.room : 'Watch party') : null));
+  if (TV.channel === 2 && WatchParty.room) box.append(h('p', { class: 'muted', style: { margin: '6px 0 0' }, text: 'You\'re in a watch party: what you pick, play, pause or skip happens for everyone.' }));
   // how the TV sounds around the apartment
   const real = Store.d.settings.tvRealistic !== false;
   const H = TVA.last;
@@ -2147,6 +2193,7 @@ const YT_HOSTS = ['www.youtube-nocookie.com', 'www.youtube.com']; // if a viewer
 const YT = {
   el: null, id: null, start: 0, state: 'idle', code: 0, title: '', playing: false, lastActive: false, time: 0, dur: 0,
   mode: 'tv', hole: null, t0: 0, helloIv: 0, vol: -1, key: '', blockedEver: false, host: 0, autoBig: false, fullOn: false,
+  ps: -1, tps: -1, timeAt: 0, loadAt: 0, auto: true, syncing: false, // ps = YouTube's own player state; syncing = the watch party is driving
   init() {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(TV_SCREEN.w, TV_SCREEN.h), new THREE.MeshBasicMaterial({ color: 0x000000, opacity: 0, transparent: false, blending: THREE.NoBlending }));
     m.position.set(TV_POS.x, TV_POS.y, TV_POS.z + 0.003); m.visible = false; m.renderOrder = 1; W.scene.add(m); this.hole = m;
@@ -2162,19 +2209,24 @@ const YT = {
     W.updaters.push((dt) => TVA.update(dt));
   },
   ok() { return this.state === 'ok' || this.state === 'playing'; },
-  load(id, t = 0, title = '') {
-    this.stop(true);
-    this.id = id; this.start = t; this.code = 0; this.title = title; this.time = t; this.dur = 0; this.playing = false; this.vol = -1; this.host = 0;
+  // o.play === false loads it paused. A player that's already up just switches videos, so phones that needed
+  // one tap on YouTube's play button keep playing new videos without another tap.
+  load(id, t = 0, title = '', o = {}) {
+    const auto = o.play !== false, reuse = !!this.el && (this.ok() || this.state === 'error');
+    if (!reuse) this.stop(true);
+    Object.assign(this, { id, start: t, code: 0, title, time: t, timeAt: performance.now(), loadAt: performance.now(), dur: 0, playing: false, vol: -1, auto, ps: -1, tps: -1 });
     TV.setChannel(2, true); this.quietOthers(); this.lastActive = true;
-    this.mount();
+    if (reuse) { this.state = 'ok'; this.cmd(auto ? 'loadVideoById' : 'cueVideoById', [id, t]); }
+    else { this.host = 0; this.mount(); }
     this.remember(id, t, title);
     Radio.emit();
+    if (!this.syncing) WatchParty.mine('load', { v: id, pos: t, title });
   },
   mount() {
     if (this.el) { this.el.remove(); this.el = null; }
     this.state = 'loading'; this.vol = -1;
     const id = this.id, t = this.start, f = document.createElement('iframe');
-    let src = `https://${YT_HOSTS[this.host]}/embed/${id}?enablejsapi=1&playsinline=1&autoplay=1&rel=0&modestbranding=1&iv_load_policy=3` + (t ? '&start=' + Math.floor(t) : '');
+    let src = `https://${YT_HOSTS[this.host]}/embed/${id}?enablejsapi=1&playsinline=1&autoplay=${this.auto ? 1 : 0}&rel=0&modestbranding=1&iv_load_policy=3` + (t ? '&start=' + Math.floor(t) : '');
     try { if (location.origin && location.origin !== 'null') src += '&origin=' + encodeURIComponent(location.origin); } catch (e) {}
     f.src = src; f.title = 'YouTube video player'; f.width = YT_W; f.height = YT_H;
     f.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen'); f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
@@ -2194,13 +2246,30 @@ const YT = {
     if (d.event === 'onError') { this.fail('error', +d.info || 0); return; }
     const info = d.info && typeof d.info === 'object' ? d.info : null;
     if (info) {
-      if (typeof info.playerState === 'number') { const was = this.playing; this.playing = info.playerState === 1 || info.playerState === 3; if (this.playing) this.lastActive = true; if (was !== this.playing) Radio.emit(); }
-      if (typeof info.currentTime === 'number') this.time = info.currentTime;
+      const vd = info.videoData && typeof info.videoData === 'object' ? info.videoData : null;
+      const vid = vd && typeof vd.video_id === 'string' && /^[\w-]{11}$/.test(vd.video_id) ? vd.video_id : '';
+      // they picked another video inside YouTube's own player (an end-screen suggestion, say)
+      if (vid && vid !== this.id && performance.now() - this.loadAt > 3000) {
+        this.id = vid; this.title = ''; this.dur = 0; this.loadAt = performance.now(); this.remember(vid, 0, ''); Radio.emit();
+        if (!this.syncing) WatchParty.mine('load', { v: vid, pos: 0 });
+      }
+      const pt = this.time, pa = this.timeAt, pps = this.tps;
+      if (typeof info.playerState === 'number') this.setPs(info.playerState);
+      if (typeof info.currentTime === 'number') { this.time = info.currentTime; this.timeAt = performance.now(); this.tps = this.ps; WatchParty.ytTime(pt, pa, pps, this.time); }
       if (typeof info.duration === 'number' && info.duration > 0) this.dur = info.duration;
-      if (info.videoData && info.videoData.title && info.videoData.title !== this.title) { this.title = String(info.videoData.title).slice(0, 120); this.remember(this.id, 0, this.title); Radio.emit(); }
+      if (vd && vd.title && (!vid || vid === this.id) && vd.title !== this.title) { this.title = String(vd.title).slice(0, 120); this.remember(this.id, 0, this.title); Radio.emit(); }
     }
-    if (d.event === 'onStateChange' && typeof d.info === 'number') { this.playing = d.info === 1 || d.info === 3; Radio.emit(); }
+    if (d.event === 'onStateChange' && typeof d.info === 'number') this.setPs(d.info);
   },
+  setPs(n) {
+    const was = this.ps, playing = n === 1 || n === 3;
+    this.ps = n; if (playing) this.lastActive = true;
+    if (was === n && playing === this.playing) return;
+    this.playing = playing; Radio.emit();
+    if (was !== n) WatchParty.ytSaw(was, n);
+  },
+  // where the video is right now (YouTube reports the time a few times a second)
+  pos() { return this.time + (this.ps === 1 ? (performance.now() - this.timeAt) / 1000 : 0); },
   fail(kind, code) {
     this.state = kind; this.code = code || 0; this.playing = false; clearInterval(this.helloIv);
     if (kind === 'blocked') { this.blockedEver = true; if (this.autoBig && Theater.on) Theater.close(); }
@@ -2221,17 +2290,26 @@ const YT = {
   away() { this.quietOthers(); toast('Paused the room\'s music so it won\'t clash'); },
   refreshPanel() { if (Panel.cur && Panel.cur.o.tv && TV.channel === 2) Panel.refresh(); },
   quietOthers() { AE.resume(); Mix.req++; if (Radio.playing) Radio.pause(); if (Mix.playing) Mix.pause(); Groove.stop(true); Vid.yieldTo(); },
-  play() { if (!this.el) { if (this.id) this.load(this.id, this.time); return; } this.quietOthers(); this.lastActive = true; this.cmd('playVideo'); this.playing = true; Radio.emit(); },
-  pause() { if (this.el) this.cmd('pauseVideo'); this.playing = false; Radio.emit(); },
+  // play / pause / seek / stop from the game's own buttons also go to the watch party (when you're in one)
+  play() {
+    if (!this.el) { if (this.id) this.load(this.id, this.time); return; }
+    this.quietOthers(); this.lastActive = true; this.cmd('playVideo'); this.playing = true; Radio.emit();
+    if (!this.syncing) WatchParty.mine('play');
+  },
+  pause() { this.hold(); if (!this.syncing) WatchParty.mine('pause'); },
+  hold() { if (this.el) this.cmd('pauseVideo'); this.playing = false; Radio.emit(); },
   toggle() { this.playing ? this.pause() : this.play(); },
-  yieldTo() { if (this.playing) this.pause(); this.lastActive = false; },
-  seekBy(s) { if (!this.el) return; this.time = Math.max(0, this.time + s); this.cmd('seekTo', [this.time, true]); },
+  // something else started playing in the room: step back quietly (the party keeps going for everyone else)
+  yieldTo() { if (this.playing) this.hold(); this.lastActive = false; WatchParty.yielded(); },
+  seekBy(s) { if (this.el) this.seekTo(Math.max(0, this.pos() + s)); },
+  seekTo(t) { if (!this.el) return; this.time = t; this.timeAt = performance.now(); this.cmd('seekTo', [t, true]); if (!this.syncing) WatchParty.mine('seek', t); },
   stop(quiet) {
+    const id = this.id;
     clearInterval(this.helloIv);
     if (this.el) { this.el.remove(); this.el = null; }
-    this.playing = false; this.lastActive = false; if (!quiet) { this.state = 'idle'; this.id = null; }
+    this.playing = false; this.lastActive = false; this.ps = -1; if (!quiet) { this.state = 'idle'; this.id = null; }
     if (this.hole) this.hole.visible = false;
-    if (!quiet) Radio.emit();
+    if (!quiet) { Radio.emit(); if (!this.syncing) WatchParty.mine('stop', id); }
   },
   remember(id, t, title) {
     const list = Store.d.ytRecent || (Store.d.ytRecent = []);
@@ -2387,7 +2465,8 @@ function ytResults(box, watch) {
 }
 // pick a video anywhere (remote, search, the computer): it goes on the TV.
 // On phones the big screen opens first so you can tap YouTube's own play button (skipped once we know this viewer blocks it).
-function ytWatch(id, t = 0, title = '') { YT.load(id, t, title); if (isTouch && !Theater.on && !YT.blockedEver) { Theater.open(); YT.autoBig = true; } }
+// (a player that's already running just switches videos, so it needs no new tap)
+function ytWatch(id, t = 0, title = '') { YT.load(id, t, title); if (isTouch && YT.state === 'loading' && !Theater.on && !YT.blockedEver) { Theater.open(); YT.autoBig = true; } }
 // from the computer: stand up and head to the couch while it starts on the TV
 function ytWatchOnTV(id, title) {
   PC.exit(); ytWatch(id, 0, title);
@@ -4782,7 +4861,8 @@ const Menus = {
           h('button', { class: 'btn sm lilac', onclick: () => openTV() }, 'TV remote'),
           h('button', { class: 'btn sm tang', onclick: () => this.decor() }, 'Decorate + weather'),
           h('button', { class: 'btn sm', onclick: () => Photo.open() }, 'Photo mode'),
-          h('button', { class: 'btn sm primary', onclick: () => Buddy.open() }, 'Talk to ' + Buddy.name())));
+          h('button', { class: 'btn sm primary', onclick: () => Buddy.open() }, 'Talk to ' + Buddy.name()),
+          h('button', { class: 'btn sm pink', id: 'thingsParty', onclick: () => WatchParty.open() }, WatchParty.room ? 'Party ' + WatchParty.room : 'Watch party')));
         b.append(this.missionsCard());
         ROOM_ORDER.forEach(room => {
           const list = W.interact.filter(i => i.room === room && !i.cloth);
@@ -5247,7 +5327,9 @@ TV + VIDEOS
   Channel 1: add your own MP4s. They keep playing when you get up.
   Channel 2: paste a YouTube link to watch it on the TV.${inClaude() ? `
   (Claude's viewer blocks YouTube's player, so in there you get a
-  one-tap way to open it in YouTube instead.)` : ''}
+  one-tap way to open it in YouTube instead.)` : `
+  Watch party (≡ menu): get a 6-digit room number, and friends
+  watch the same YouTube video with you, in sync.`}
   Room sound: walk away and the TV fades, muffles and echoes.
 
 YOUR PICTURES
@@ -7015,6 +7097,603 @@ function tvHiRes(on) {
   cv.width = w; cv.height = on ? 432 : 216; tvT = 1;
 }
 
+// ---------- watch party: friends watch the same YouTube video together, in sync (website only) ----------
+// A party is a room with a 6-digit number in the game's Firebase Realtime Database, reached with plain web
+// requests (no Firebase code needed): rooms/<number> = { created, tv, peers, chat }
+//   tv     what's on: video, playing or paused, and its position at a Firebase timestamp
+//   peers  who's here (everyone checks in every 15 seconds)
+//   chat   messages and emoji reactions (trimmed to the latest few dozen)
+// Changes arrive live over one streaming connection (or by checking every few seconds if that's blocked).
+// Each player works out where the video should be "now" and nudges itself back if it drifts. Anyone can
+// drive: play, pause, skip or pick a video and it happens for everyone. Everything that comes from a room
+// is treated as untrusted: checked, trimmed, and only ever shown as text.
+const PARTY_DB = 'https://dialup-den-default-rtdb.firebaseio.com';
+const SITE_URL = 'https://toltecs101.github.io/dialup-den/';
+const PARTY_EMOJI = ['😂', '😮', '🔥', '❤️', '👏', '💀'];
+const FB_NOW = { '.sv': 'timestamp' }; // Firebase fills in its own clock
+const HERE_MS = 75000, GONE_MS = 15 * 60000;
+const BAD_KEY = (k) => k === '__proto__' || k === 'constructor' || k === 'prototype';
+
+const PartyNet = {
+  url(path) { return PARTY_DB.replace(/\/+$/, '') + '/' + path + '.json'; },
+  async req(method, path, body) {
+    let r;
+    try { r = await fetch(this.url(path), { method, cache: 'no-store', body: body === undefined ? undefined : JSON.stringify(body) }); }
+    catch (e) { throw { code: 'network' }; }
+    const j = await r.json().catch(() => null);
+    if (!r.ok) throw { code: r.status === 401 || r.status === 403 ? 'denied' : 'http', status: r.status };
+    return j;
+  },
+};
+
+const WatchParty = {
+  room: '', pid: '', R: null, S: null, seq: 0, tvKey: '', echoWait: 0, seen: new Set(), peersSeen: new Map(),
+  es: null, polling: false, pollT: 0, lastEv: 0, hbIv: 0, syncIv: 0, sweptAt: 0, trouble: false,
+  off: 0, offErr: Infinity, offAt: 0, beatT0: 0, beatDone: 0,
+  away: false, cmdAt: 0, playAt: 0, seekAt: 0, loadedAt: 0, stuckAt: 0, nudged: '',
+  ui: null, unread: 0, tray: false, busy: false, err: '', inviteCode: '', sending: false, nextTv: null, lastReact: 0, lastSay: 0,
+
+  ready() { return !!PARTY_DB && !inClaude(); },
+  name() { return String(Store.d.screenName || 'guest').slice(0, 24); },
+  now() { return Date.now() + this.off; }, // Firebase's clock, as best we can tell
+  link() { return location.origin + location.pathname + '?party=' + this.room; },
+
+  init() {
+    $('#partyPill').onclick = () => this.open();
+    $('#cbParty').onclick = () => { this.tray = !this.tray; this.render(); };
+    const tray = $('#reactTray');
+    PARTY_EMOJI.forEach(e => tray.append(h('button', { class: 'btn ic', 'aria-label': 'React ' + e, onclick: () => this.react(e) }, e)));
+    tray.append(h('button', { class: 'btn lilac', id: 'trayChat', onclick: () => { this.tray = false; this.open(); } }, 'Chat'));
+    W.updaters.push(() => { if (this.tray && !Couch.on) { this.tray = false; this.render(); } });
+    addEventListener('pagehide', () => this.bye());
+    addEventListener('pageshow', (e) => { if (e.persisted && this.room) { this.beat(); this.listen(); } });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden || !this.room) return;
+      this.beat(); if (!this.polling && Date.now() - this.lastEv > 20000) this.listen(); this.apply();
+    });
+    if (this.ready()) { try { const c = new URL(location.href).searchParams.get('party'); if (/^\d{6}$/.test(c || '')) this.inviteCode = c; } catch (e) {} }
+  },
+
+  // ---- rooms ----
+  async start() {
+    if (!this.ready() || this.busy || this.room) return;
+    this.busy = true; this.err = ''; this.refreshPanel();
+    try {
+      let code = '';
+      for (let i = 0; i < 6 && !code; i++) {
+        const c = String(100000 + crypto.getRandomValues(new Uint32Array(1))[0] % 900000);
+        if (!this.alive(await PartyNet.req('GET', 'rooms/' + c))) code = c;
+      }
+      if (!code) throw { code: 'busy' };
+      this.pid = uid(); this.seq = 0;
+      const tv = this.tvNow(), t0 = Date.now();
+      const r = await PartyNet.req('PUT', 'rooms/' + code, { created: FB_NOW, tv: Object.assign({}, tv, { at: FB_NOW }), peers: { [this.pid]: this.me() } });
+      const me = r && r.peers && r.peers[this.pid];
+      if (!this.clock(me && me.t, t0, Date.now())) { this.beatT0 = t0; this.beatDone = Date.now(); }
+      const R = { created: this.now(), tv: Object.assign({}, tv, { at: this.now() }), peers: {} };
+      R.peers[this.pid] = { n: this.name(), t: this.now() };
+      this.enter(code, R);
+      toast('<b>PARTY ' + code + '</b> Send friends this number', '', 4000);
+    } catch (e) { this.err = this.errText(e); }
+    this.busy = false; this.refreshPanel();
+  },
+  async join(code) {
+    code = String(code || '').replace(/\D/g, '');
+    if (!this.ready() || this.busy) return;
+    if (code.length !== 6) { this.err = 'Room numbers have 6 digits.'; this.refreshPanel(); return; }
+    if (code === this.room) { this.refreshPanel(); return; }
+    if (this.room) await this.leave(true);
+    this.busy = true; this.err = ''; this.refreshPanel();
+    try {
+      const room = await PartyNet.req('GET', 'rooms/' + code);
+      if (!room || typeof room !== 'object') throw { code: 'none' };
+      if (!this.alive(room)) throw { code: 'ended' };
+      this.pid = uid(); this.seq = 0;
+      const t0 = Date.now(); this.beatT0 = t0;
+      const r = await PartyNet.req('PUT', `rooms/${code}/peers/${this.pid}`, this.me());
+      if (this.clock(r && r.t, t0, Date.now())) this.beatT0 = 0; else this.beatDone = Date.now();
+      this.inviteCode = '';
+      this.R = room; this.setAt(['peers', this.pid], { n: this.name(), t: this.now() });
+      this.enter(code, this.R);
+      const others = this.here().slice(1).map(p => p.n);
+      toast('<b>JOINED PARTY ' + code + '</b> ' + (others.length ? 'with ' + esc(others.slice(0, 3).join(', ')) + (others.length > 3 ? ' +' + (others.length - 3) : '') : 'Nobody else is here right now'), '', 4000);
+      if (isSmall() && Panel.cur && Panel.cur.o.party) Panel.close(true); // phones: get out of the way of the video (the pill brings it back)
+    } catch (e) { this.err = this.errText(e); }
+    this.busy = false; this.refreshPanel();
+  },
+  // a room is worth joining if someone checked in during the last 15 minutes (phones that slept still count)
+  alive(room) {
+    const P = room && typeof room === 'object' && room.peers && typeof room.peers === 'object' ? room.peers : null;
+    if (!P) return false;
+    const now = this.now();
+    return Object.keys(P).some(k => { const p = P[k]; return p && typeof p === 'object' && !p.gone && typeof p.t === 'number' && now - p.t < GONE_MS; });
+  },
+  errText(e) {
+    const c = e && e.code;
+    return c === 'none' ? 'No party with that number. Check it and try again.'
+      : c === 'ended' ? 'That party has ended. Start a new one?'
+      : c === 'denied' ? 'The party server said no. It may not be set up yet.'
+      : c === 'busy' ? 'Couldn\'t find a free room number. Try again.'
+      : 'Couldn\'t reach the party server. Check your connection and try again.';
+  },
+  me() { return { n: this.name(), t: FB_NOW }; },
+  // what your TV is showing right now (a party you start begins with it)
+  tvNow() {
+    const v = YT.id && YT.el && YT.ok() ? YT.id : '';
+    return { v, pos: v ? Math.round(YT.pos() * 100) / 100 : 0, p: !!(v && YT.playing), ti: v ? String(YT.title || '').slice(0, 100) : '', e: 0, by: this.pid, n: this.name(), q: ++this.seq };
+  },
+  enter(code, R) {
+    Object.assign(this, { room: code, R, S: null, tvKey: '', echoWait: 0, away: false, unread: 0, polling: false, trouble: false, nudged: '', stuckAt: 0, lastEv: Date.now(), sweptAt: Date.now() });
+    this.seen = new Set(); this.peersSeen = new Map();
+    this.digest(true);
+    clearInterval(this.hbIv); this.hbIv = setInterval(() => this.beat(), 15000);
+    [2000, 6000].forEach(ms => setTimeout(() => { if (this.room === code) this.beat(); }, ms)); // a couple of quick check-ins to settle the clock
+    clearInterval(this.syncIv); this.syncIv = setInterval(() => this.tick(), 1000);
+    this.listen();
+    this.setUrl(code);
+    this.render();
+  },
+  teardown() {
+    clearInterval(this.hbIv); clearInterval(this.syncIv); this.closeStream();
+    Object.assign(this, { room: '', R: null, S: null, tvKey: '', away: false, tray: false, unread: 0, polling: false, trouble: false, sending: false, nextTv: null });
+    this.setUrl(''); this.render(); this.refreshPanel();
+  },
+  async leave(quiet) {
+    if (!this.room) return;
+    const code = this.room, pid = this.pid, now = this.now();
+    const others = this.peers().some(p => p.id !== pid && !p.gone && now - p.t < GONE_MS);
+    this.teardown();
+    if (!quiet) toast('Left the watch party');
+    // last one out turns off the lights (checking again, in case everyone left at once)
+    try {
+      if (others) { await PartyNet.req('DELETE', `rooms/${code}/peers/${pid}`); if (await PartyNet.req('GET', `rooms/${code}/peers`)) return; }
+      await PartyNet.req('DELETE', 'rooms/' + code);
+    } catch (e) {}
+  },
+  ended() { if (!this.room) return; this.teardown(); toast('<b>PARTY OVER</b> That room closed'); },
+  // closing the tab: a fire-and-forget note so friends see you left (a plain POST always gets through)
+  bye() { if (!this.room) return; try { navigator.sendBeacon(PartyNet.url(`rooms/${this.room}/peers/${this.pid}/gone`), '1'); } catch (e) {} },
+  setUrl(code) {
+    try {
+      const u = new URL(location.href);
+      if (code) u.searchParams.set('party', code); else u.searchParams.delete('party');
+      if (u.href !== location.href) history.replaceState(history.state, '', u.href);
+    } catch (e) {}
+  },
+
+  // ---- staying in touch ----
+  async beat() {
+    if (!this.room) return;
+    const code = this.room, t0 = Date.now(); this.beatT0 = t0;
+    try {
+      const r = await PartyNet.req('PUT', `rooms/${code}/peers/${this.pid}`, this.me());
+      if (code !== this.room) return;
+      if (this.clock(r && r.t, t0, Date.now())) this.beatT0 = 0; else this.beatDone = Date.now();
+      this.setTrouble(false);
+    } catch (e) { if (code === this.room) this.setTrouble(true); }
+    if (code !== this.room) return;
+    if (!this.polling && Date.now() - this.lastEv > 50000) this.listen(); // the live connection went quiet
+    this.sweep();
+  },
+  // Firebase stamped our check-in somewhere between sending it (t0) and hearing back (t1)
+  clock(t, t0, t1) {
+    if (typeof t !== 'number' || !isFinite(t) || t1 < t0) return false;
+    const err = (t1 - t0) / 2;
+    if (err <= this.offErr || Date.now() - this.offAt > 120000) { this.off = t - (t0 + t1) / 2; this.offErr = err; this.offAt = Date.now(); }
+    return true;
+  },
+  setTrouble(on) { if (this.trouble !== on) { this.trouble = on; this.render(); } },
+  // tidy up people who left long ago
+  sweep() {
+    if (Date.now() - this.sweptAt < 60000) return;
+    this.sweptAt = Date.now();
+    const now = this.now(), old = this.peers().filter(p => p.id !== this.pid && (p.gone || now - p.t > GONE_MS));
+    if (old.length) PartyNet.req('PATCH', `rooms/${this.room}/peers`, Object.fromEntries(old.map(p => [p.id, null]))).catch(() => {});
+  },
+  listen() {
+    this.closeStream();
+    if (!this.room) return;
+    if (this.polling || typeof EventSource === 'undefined') { this.poll(); return; }
+    let es; try { es = new EventSource(PartyNet.url('rooms/' + this.room)); } catch (e) { this.polling = true; this.poll(); return; }
+    this.es = es;
+    let got = false;
+    const ok = () => { got = true; this.lastEv = Date.now(); this.setTrouble(false); };
+    const fallback = () => { if (this.es !== es) return; this.closeStream(); this.polling = true; this.poll(); };
+    es.addEventListener('put', (e) => { if (this.es === es) { ok(); this.event(e.data, false); } });
+    es.addEventListener('patch', (e) => { if (this.es === es) { ok(); this.event(e.data, true); } });
+    es.addEventListener('keep-alive', () => { if (this.es === es) ok(); });
+    es.addEventListener('cancel', fallback);
+    es.addEventListener('auth_revoked', fallback);
+    es.onerror = () => {
+      if (this.es !== es) return;
+      if (es.readyState !== 2) return; // the browser is reconnecting by itself
+      if (!got) { fallback(); return; } // never worked here: check in every few seconds instead
+      this.closeStream(); this.setTrouble(true);
+      setTimeout(() => { if (this.room && !this.es && !this.polling) this.listen(); }, 3000);
+    };
+    setTimeout(() => { if (this.es === es && !got) fallback(); }, 10000);
+  },
+  closeStream() { if (this.es) { try { this.es.close(); } catch (e) {} this.es = null; } clearTimeout(this.pollT); },
+  poll() {
+    clearTimeout(this.pollT);
+    if (!this.room) return;
+    const code = this.room, asked = Date.now();
+    PartyNet.req('GET', 'rooms/' + code).then((r) => {
+      if (code !== this.room) return;
+      this.lastEv = Date.now(); this.setTrouble(false);
+      this.R = r && typeof r === 'object' ? r : null;
+      // our last check-in was stamped between sending it and this answer
+      if (this.beatT0 && this.beatDone && asked >= this.beatDone && this.R) { const me = this.R.peers && this.R.peers[this.pid]; if (me && this.clock(me.t, this.beatT0, Date.now())) this.beatT0 = 0; }
+      this.digest(false);
+    }, () => { if (code === this.room) this.setTrouble(true); })
+      .finally(() => { if (code === this.room && this.polling) this.pollT = setTimeout(() => this.poll(), 2500); });
+  },
+  event(raw, patch) {
+    let d; try { d = JSON.parse(raw); } catch (e) { return; }
+    if (!d || typeof d.path !== 'string') return;
+    const base = d.path.split('/').filter(Boolean), mine = (s) => s[0] === 'peers' && s[1] === this.pid;
+    let touched = false;
+    if (patch) {
+      if (d.data && typeof d.data === 'object') for (const k of Object.keys(d.data)) { const s = base.concat(k.split('/').filter(Boolean)); if (mine(s)) touched = true; this.setAt(s, d.data[k]); }
+    } else { if (mine(base)) touched = true; this.setAt(base, d.data); }
+    // our check-in came back stamped with Firebase's clock
+    if (touched && this.beatT0) { const me = this.R && this.R.peers && this.R.peers[this.pid]; if (me && this.clock(me.t, this.beatT0, Date.now())) this.beatT0 = 0; }
+    this.digest(false);
+  },
+  setAt(segs, val) {
+    if (segs.some(BAD_KEY)) return;
+    if (!segs.length) { this.R = val && typeof val === 'object' ? val : null; return; }
+    if (!this.R || typeof this.R !== 'object') this.R = {};
+    let o = this.R;
+    for (let i = 0; i < segs.length - 1; i++) {
+      const k = segs[i];
+      if (!o[k] || typeof o[k] !== 'object') { if (val == null) return; o[k] = {}; }
+      o = o[k];
+    }
+    const last = segs[segs.length - 1];
+    if (val == null) delete o[last]; else o[last] = val;
+  },
+
+  // ---- making sense of the room ----
+  peers() {
+    const P = this.R && this.R.peers && typeof this.R.peers === 'object' ? this.R.peers : {};
+    return Object.keys(P).filter(k => P[k] && typeof P[k] === 'object').map(k => ({ id: k, n: typeof P[k].n === 'string' && P[k].n ? P[k].n.slice(0, 24) : 'guest', t: typeof P[k].t === 'number' ? P[k].t : 0, gone: !!P[k].gone }));
+  },
+  // you first, then everyone who checked in lately
+  here() { const now = this.now(); return [{ id: this.pid, n: this.name(), t: now }].concat(this.peers().filter(p => p.id !== this.pid && !p.gone && now - p.t < HERE_MS)); },
+  cleanTv(x) {
+    if (!x || typeof x !== 'object') return null;
+    const num = (n, a, b) => (typeof n === 'number' && isFinite(n) ? clamp(n, a, b) : a);
+    const v = typeof x.v === 'string' && /^[\w-]{11}$/.test(x.v) ? x.v : '';
+    return { v, pos: num(x.pos, 0, 86400), p: !!(v && x.p === true), at: num(x.at, 0, 1e15), ti: typeof x.ti === 'string' ? x.ti.slice(0, 100) : '', e: x.e === 1 ? 1 : 0, by: typeof x.by === 'string' ? x.by.slice(0, 20) : '', n: typeof x.n === 'string' ? x.n.slice(0, 24) : '', q: num(x.q, 0, 1e9) };
+  },
+  cleanMsg(m) {
+    if (!m || typeof m !== 'object' || typeof m.m !== 'string' || !m.m.trim()) return null;
+    return { n: typeof m.n === 'string' && m.n ? m.n.slice(0, 24) : 'guest', m: m.m.slice(0, 200), t: typeof m.t === 'number' ? m.t : 0, k: m.k === 'r' ? 'r' : '', by: typeof m.by === 'string' ? m.by.slice(0, 20) : '' };
+  },
+  digest(initial) {
+    if (!this.room) return;
+    if (!this.R || typeof this.R !== 'object') { this.ended(); return; }
+    this.digestTv(initial);
+    const now = this.now(), seen = new Map();
+    this.peers().forEach(p => { if (!p.gone && now - p.t < GONE_MS) seen.set(p.id, p.n); });
+    if (!initial) {
+      seen.forEach((n, id) => { if (!this.peersSeen.has(id) && id !== this.pid) toast('<b>' + esc(n.toUpperCase()) + '</b> joined the party'); });
+      this.peersSeen.forEach((n, id) => { if (!seen.has(id) && id !== this.pid) toast(esc(n) + ' left the party'); });
+    }
+    this.peersSeen = seen;
+    const C = this.R.chat && typeof this.R.chat === 'object' ? this.R.chat : {};
+    for (const k of Object.keys(C).sort()) if (!this.seen.has(k)) { this.seen.add(k); if (!initial) this.incoming(C[k]); }
+    this.render();
+  },
+  digestTv(initial) {
+    const tv = this.cleanTv(this.R && this.R.tv), key = tv ? JSON.stringify(tv) : '';
+    if (key === this.tvKey) return;
+    const myLatest = !!tv && tv.by === this.pid && tv.q === this.seq;
+    if (tv && !myLatest && this.echoWait && Date.now() < this.echoWait) return; // our own newer change is still on its way
+    if (myLatest) this.echoWait = 0;
+    this.tvKey = key;
+    if (!tv) return;
+    const old = this.S; this.S = tv;
+    if (!initial && tv.by !== this.pid) this.announce(old, tv);
+    if (old && old.v && !tv.v && YT.id === old.v) this.sync(() => YT.stop());
+    if (tv.v && (!old || old.v !== tv.v)) { this.away = false; this.stuckAt = 0; } // a new video pulls everyone back in
+    this.apply(); this.render();
+  },
+  announce(old, tv) {
+    if (tv.e) return;
+    const who = '<b>' + esc((tv.n || 'Someone').toUpperCase()) + '</b> ';
+    if (tv.v && (!old || old.v !== tv.v)) toast(who + 'put on ' + esc(tv.ti || 'a new video'));
+    else if (!tv.v) { if (old && old.v) toast(who + 'turned off the video'); }
+    else if (old.p !== tv.p) toast(who + (tv.p ? 'pressed play' : 'paused'));
+    else if (Math.abs(tv.pos - (old.p ? old.pos + Math.max(0, (tv.at - old.at) / 1000) : old.pos)) > 4) toast(who + 'skipped to ' + fmtMMSS(tv.pos));
+  },
+  // where the party's video should be right now
+  expected(S) { return S.p && S.at ? S.pos + Math.max(0, (this.now() - S.at) / 1000) : S.pos; },
+
+  // ---- keeping your TV in step ----
+  sync(fn) { const was = YT.syncing; YT.syncing = true; try { fn(); } finally { YT.syncing = was; } },
+  apply() {
+    const S = this.S;
+    if (!this.room || !S || !S.v || YT.state === 'blocked') return;
+    const now = performance.now();
+    this.sync(() => {
+      let E = this.expected(S);
+      if (YT.id !== S.v || !YT.el) {
+        if (this.away) return;
+        const fresh = !YT.el;
+        YT.load(S.v, E, S.ti, { play: S.p });
+        this.cmdAt = this.loadedAt = now; this.stuckAt = 0;
+        if (fresh && S.p && isTouch && !Theater.on && !YT.blockedEver) { Theater.open(); YT.autoBig = true; } // phones may need one tap on YouTube's play button
+        return;
+      }
+      if (this.away || !YT.ok()) return;
+      if (YT.dur) E = Math.min(E, YT.dur);
+      const ps = YT.ps, L = YT.pos();
+      if (S.p) {
+        if (ps === 0 || (YT.dur && E >= YT.dur - 0.5)) { this.stuckAt = 0; return; } // that's the end
+        if (ps !== 1 && ps !== 3) {
+          if (now - this.playAt > 2500) { this.playAt = this.cmdAt = now; YT.play(); }
+          if (!this.stuckAt) this.stuckAt = now;
+          // still not playing a few seconds later: this browser wants one tap on the video first
+          if (now - this.stuckAt > 6000 && now - this.loadedAt > 6000 && this.nudged !== S.v) { this.nudged = S.v; this.nudge(); }
+          return;
+        }
+        this.stuckAt = 0;
+        if (ps === 1 && Math.abs(L - E) > 1.5 && now - this.seekAt > 3000) { this.seekAt = this.cmdAt = now; YT.seekTo(E + 0.3); }
+        return;
+      }
+      this.stuckAt = 0;
+      if (ps === 1 || ps === 3) { this.cmdAt = now; YT.pause(); }
+      else if (ps === 2 && Math.abs(L - E) > 0.75 && now - this.seekAt > 1500) { this.seekAt = this.cmdAt = now; YT.seekTo(E); }
+      else if ((ps === -1 || ps === 5) && Math.abs(YT.time - E) > 1.5 && now - this.seekAt > 3000) { this.seekAt = this.cmdAt = now; YT.start = YT.time = E; YT.cmd('cueVideoById', [S.v, E]); }
+    });
+  },
+  nudge() {
+    if (!Theater.on && !YT.fullOn) { Theater.open(); YT.autoBig = true; }
+    toast('<b>TAP PLAY</b> on the video to join in. Your browser wants one tap first.', '', 6000);
+  },
+  tick() { if (!this.room) return; this.digestTv(false); this.apply(); this.render(); },
+
+  // ---- things you do (from the game's buttons, or from YouTube's own controls on the big screen) ----
+  mine(kind, a) {
+    const S = this.S;
+    if (!this.room) return;
+    if (kind === 'stop') { if (S && S.v && a === S.v) this.write({ v: '', pos: 0, p: false, ti: '', e: 0 }); return; }
+    if (kind === 'load') { this.away = false; this.write({ v: a.v, pos: a.pos || 0, p: true, ti: String(a.title || '').slice(0, 100), e: 0 }); return; }
+    if (!S || !S.v || YT.id !== S.v) { // a video that isn't the party's yet: share it
+      if (YT.id) this.write({ v: YT.id, pos: YT.pos(), p: kind !== 'pause', ti: String(YT.title || '').slice(0, 100), e: 0 });
+      return;
+    }
+    if (kind === 'play') {
+      this.away = false;
+      if (S.p) { this.apply(); this.render(); return; } // already playing for everyone: just catch up
+      this.write({ p: true, pos: S.e || (YT.dur && S.pos >= YT.dur - 1) ? 0 : S.pos, e: 0 });
+    } else if (kind === 'pause') {
+      if (!S.p) return;
+      const E = this.expected(S), L = YT.pos();
+      this.write({ p: false, pos: Math.abs(L - E) < 5 ? L : E });
+    } else if (kind === 'seek') this.write({ pos: Math.max(0, +a || 0), e: 0 });
+  },
+  ytSaw(was, n) {
+    const S = this.S;
+    if (!this.room || !S || !S.v || YT.id !== S.v) return;
+    if (n === 1 && this.away) { this.away = false; this.render(); } // they pressed play on YouTube itself
+    const now = performance.now();
+    if (this.away || YT.syncing || document.hidden || now - this.cmdAt < 2500 || now - YT.loadAt < 2500) return;
+    if (n === 2 && S.p && (was === 1 || was === 3)) this.write({ p: false, pos: YT.time });
+    else if (n === 1 && !S.p) this.write({ p: true, pos: YT.time, e: 0 });
+    else if (n === 0 && S.p && YT.dur) this.write({ p: false, pos: YT.dur, e: 1 });
+  },
+  // a jump in YouTube's clock that playing can't explain = someone dragged YouTube's own timeline
+  ytTime(pt, pa, pps, t) {
+    const S = this.S, now = performance.now();
+    if (!this.room || !S || !S.v || YT.id !== S.v || this.away || document.hidden || !pa) return;
+    if (now - this.cmdAt < 2500 || now - YT.loadAt < 4000) return;
+    const wall = (now - pa) / 1000, live = (s) => s === 1 || s === 2 || s === 3;
+    if (wall > 10 || !live(pps) || !live(YT.ps)) return;
+    const adv = t - pt, moving = pps !== 2 || YT.ps !== 2;
+    if (adv < -1.5 || adv > (moving ? wall + 2 : 1.5)) this.write({ pos: t, e: 0 });
+  },
+  // something else started playing on your side (radio, your MP4s): you step out, everyone else carries on
+  yielded() { if (!this.room || YT.syncing || !this.S || !this.S.v || YT.id !== this.S.v) return; this.cmdAt = performance.now(); if (!this.away) { this.away = true; this.render(); } },
+  rejoin() { this.away = false; this.stuckAt = 0; this.apply(); this.render(); },
+  write(patch) {
+    if (!this.room) return;
+    const base = this.S || { v: '', pos: 0, p: false, ti: '', e: 0 };
+    const S = Object.assign({}, base, patch, { at: this.now(), by: this.pid, n: this.name(), q: ++this.seq });
+    if (patch.v !== undefined && patch.v !== base.v && patch.ti === undefined) S.ti = '';
+    S.pos = Math.round(Math.max(0, +S.pos || 0) * 100) / 100;
+    if (!S.v) S.p = false;
+    this.S = S; this.echoWait = Date.now() + 3000;
+    this.send(Object.assign({}, S, { at: FB_NOW }));
+    this.apply(); this.render();
+  },
+  // one change at a time, newest wins, so they land in order
+  send(body, retry) {
+    if (this.sending) { this.nextTv = body; return; }
+    const code = this.room; this.sending = true;
+    PartyNet.req('PUT', `rooms/${code}/tv`, body).then(() => this.setTrouble(false), (e) => {
+      if (code !== this.room) return;
+      this.setTrouble(true);
+      if (e.code === 'denied') toast('The party server didn\'t accept that change');
+      else if (!retry) setTimeout(() => { if (code === this.room && body.q === this.seq && !this.sending) this.send(body, true); }, 2000);
+    }).finally(() => { this.sending = false; const n = this.nextTv; this.nextTv = null; if (n && code === this.room) this.send(n); });
+  },
+
+  // ---- chat + reactions ----
+  react(e) {
+    if (!this.room || !PARTY_EMOJI.includes(e)) return;
+    const now = performance.now(); if (now - this.lastReact < 200) return; this.lastReact = now;
+    this.float(e, this.name());
+    this.post({ m: e, k: 'r' });
+  },
+  say(text) {
+    text = String(text || '').trim().slice(0, 200);
+    if (!text || !this.room) return false;
+    const now = performance.now(); if (now - this.lastSay < 600) return false; this.lastSay = now;
+    this.post({ m: text });
+    return true;
+  },
+  async post(msg) {
+    const code = this.room, body = Object.assign({ n: this.name(), t: FB_NOW, by: this.pid }, msg);
+    try {
+      const r = await PartyNet.req('POST', `rooms/${code}/chat`, body);
+      if (code !== this.room || !r || typeof r.name !== 'string') return;
+      if (!this.seen.has(r.name)) { this.seen.add(r.name); this.setAt(['chat', r.name], Object.assign({}, body, { t: this.now() })); this.render(); }
+      this.trim();
+    } catch (e) { if (code === this.room && !msg.k) toast('Couldn\'t send that. Check your connection.'); }
+  },
+  trim() {
+    const C = this.R && this.R.chat; if (!C || typeof C !== 'object') return;
+    const keys = Object.keys(C).sort(); if (keys.length <= 60) return;
+    PartyNet.req('PATCH', `rooms/${this.room}/chat`, Object.fromEntries(keys.slice(0, keys.length - 45).map(k => [k, null]))).catch(() => {});
+  },
+  incoming(raw) {
+    const m = this.cleanMsg(raw);
+    if (!m || m.by === this.pid) return;
+    const fresh = !m.t || Math.abs(this.now() - m.t) < 20000; // skip old news after a reconnect
+    if (m.k === 'r') { if (fresh && PARTY_EMOJI.includes(m.m)) this.float(m.m, m.n); return; }
+    if (this.ui) return;
+    this.unread++;
+    if (fresh) toast('<b>' + esc(m.n.toUpperCase()) + '</b> ' + esc(m.m.slice(0, 140)), '', 5000);
+  },
+  float(e, n) {
+    const fx = $('#partyFx'); if (fx.childElementCount > 24) return;
+    const el = h('div', { class: 'pfloat', style: { left: (14 + Math.random() * 72) + '%', '--dx': Math.round((Math.random() - 0.5) * 70) + 'px' } }, h('span', { class: 'pe', text: e }), n ? h('small', { text: n }) : null);
+    fx.append(el); setTimeout(() => el.remove(), 2800);
+  },
+
+  // ---- screens ----
+  sub() { return !this.ready() ? (inClaude() ? 'Works on the website version' : 'Not set up on this copy') : this.room ? 'Room ' + this.room + ' · ' + this.here().length + ' here' : 'Watch YouTube together, in sync'; },
+  open(code) {
+    if (code) this.inviteCode = code;
+    this.err = '';
+    Panel.open({ title: 'Watch party', sub: this.sub(), acc: 'var(--bubble)', icon: ICO.party, endsActivity: false, cls: 'tall', party: true,
+      body: (b) => this.body(b), foot: (f) => this.foot(f), onClose: () => { this.ui = null; this.render(); } });
+  },
+  refreshPanel() { if (!Panel.cur || !Panel.cur.o.party) return; Panel.refresh(); const s = Panel.cur.el.querySelector('.panel-head p'); if (s) s.textContent = this.sub(); },
+  setName(v) {
+    const n = String(v || '').trim().replace(/\s+/g, '').slice(0, 24) || 'chillvibez2k';
+    if (n === Store.d.screenName) return;
+    Store.d.screenName = n; Store.save();
+    if (this.room) this.beat();
+  },
+  body(b) {
+    this.ui = null;
+    if (!this.ready()) {
+      b.append(card('Watch YouTube together', h('p', { class: 'muted', style: { margin: '0 0 8px' }, text: inClaude() ? 'Watch parties work on the website version of the game, where YouTube can play. Friends join with a room number and everyone watches the same video in sync.' : 'Watch parties aren\'t set up on this copy of the game.' }),
+        inClaude() ? h('a', { class: 'btn sm pink', href: SITE_URL, target: '_blank', rel: 'noopener noreferrer' }, 'Open the website ↗') : null));
+      return;
+    }
+    if (this.room) { this.partyBody(b); return; }
+    const nameIn = h('input', { class: 'inp', id: 'partyName', maxlength: 24, value: this.name(), autocomplete: 'nickname', autocapitalize: 'off', spellcheck: 'false', onchange: (e) => this.setName(e.target.value) });
+    const status = this.busy ? h('p', { class: 'muted', style: { margin: 0 }, text: 'Connecting…' }) : this.err ? h('p', { class: 'yt-warn', id: 'partyErr', text: this.err }) : null;
+    const nameField = h('label', { class: 'field' }, 'Your name (friends see this)', nameIn);
+    if (this.inviteCode) {
+      const join = () => { this.setName(nameIn.value); this.join(this.inviteCode); };
+      b.append(card('You\'re invited!', h('p', { class: 'muted', style: { margin: '0 0 10px' }, text: 'Party ' + this.inviteCode + ' is watching YouTube together. Join and your TV plays the same video, in sync.' }), nameField,
+        h('div', { class: 'row', style: { marginTop: '10px' } }, h('button', { class: 'btn primary', id: 'partyJoin', disabled: this.busy, onclick: join }, 'Join party ' + this.inviteCode), h('button', { class: 'btn sm ghost', onclick: () => { this.inviteCode = ''; this.err = ''; this.setUrl(''); this.refreshPanel(); } }, 'Not now'))));
+      if (status) b.append(status);
+      return;
+    }
+    const codeIn = h('input', { class: 'inp num', id: 'partyCode', inputmode: 'numeric', pattern: '[0-9]*', maxlength: 6, autocomplete: 'off', placeholder: '6-digit number', 'aria-label': 'Room number' });
+    const join = () => { this.setName(nameIn.value); this.join(codeIn.value); };
+    codeIn.addEventListener('input', () => { const v = codeIn.value.replace(/\D/g, '').slice(0, 6); if (v !== codeIn.value) codeIn.value = v; });
+    codeIn.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); join(); } });
+    b.append(card('Watch YouTube together', h('p', { class: 'muted', style: { margin: '0 0 10px' }, text: 'Start a party to get a 6-digit room number. Friends open the game and join with it, and everyone\'s TV plays the same YouTube video. Anyone can play, pause or skip, and it happens for all.' }), nameField,
+      h('button', { class: 'btn primary', id: 'partyStart', style: { marginTop: '10px' }, disabled: this.busy, onclick: () => { this.setName(nameIn.value); this.start(); } }, 'Start a party')));
+    b.append(card('Join a party', h('div', { class: 'row', style: { flexWrap: 'nowrap' } }, codeIn, h('button', { class: 'btn pink', id: 'partyJoinBtn', disabled: this.busy, onclick: join }, 'Join'))));
+    if (status) b.append(status);
+    b.append(irl('Far apart? Hop on a call while you watch. Reactions pop up on everyone\'s screen.'));
+  },
+  partyBody(b) {
+    const ui = this.ui = {};
+    const share = !!navigator.share;
+    b.append(h('div', { class: 'party-room' },
+      h('div', { class: 'pr-lcd' }, h('span', { text: 'ROOM' }), h('b', { class: 'num', id: 'partyRoom', text: this.room })),
+      h('div', { class: 'row' },
+        h('button', { class: 'btn sm pink', id: 'partyInvite', onclick: () => this.invite() }, share ? 'Send invite' : 'Copy invite link'),
+        h('button', { class: 'btn sm', id: 'partyCopy', onclick: () => copyText(this.room, $('#partyRoom')) }, 'Copy number')),
+      h('span', { class: 'party-link', id: 'partyLink', text: this.link() })));
+    ui.now = h('div', { class: 'card party-now' }); b.append(ui.now);
+    ui.whoLabel = h('div', { class: 'label' }); ui.who = h('div', { class: 'party-who' });
+    b.append(h('div', {}, ui.whoLabel, ui.who));
+    b.append(h('div', { class: 'party-react' }, PARTY_EMOJI.map(e => h('button', { class: 'btn', 'aria-label': 'React ' + e, onclick: () => this.react(e) }, e))));
+    ui.log = h('div', { class: 'party-log', role: 'log', 'aria-label': 'Party chat' });
+    const say = h('input', { class: 'inp', id: 'partySay', maxlength: 200, placeholder: 'Say something…', 'aria-label': 'Chat message', enterkeyhint: 'send', autocomplete: 'off' });
+    const send = () => { if (this.say(say.value)) say.value = ''; };
+    say.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); send(); } });
+    b.append(h('div', { class: 'party-chat' }, ui.log, h('div', { class: 'row', style: { flexWrap: 'nowrap' } }, say, h('button', { class: 'btn sm primary', id: 'partySend', onclick: send }, 'Send'))));
+    this.unread = 0;
+    this.renderPanel(true);
+  },
+  foot(f) { if (this.room && this.ready()) f.append(h('button', { class: 'btn', id: 'partyLeave', onclick: () => this.leave() }, 'Leave party')); },
+  invite() {
+    const url = this.link();
+    if (navigator.share) { navigator.share({ title: 'Dial-Up Den watch party', text: 'Watch YouTube with me in Dial-Up Den! Party ' + this.room, url }).catch(() => {}); return; }
+    copyText(url, $('#partyLink'));
+  },
+  pick() { TV.setChannel(2, true); if (Couch.seated()) Couch.remote('tv'); else openTV(); },
+  toCouch() { const c = W.interact.find(i => i.id === 'couch'); Panel.close(true); if (c) useInteractable(c); },
+  render() {
+    const on = !!this.room, pill = $('#partyPill');
+    if (pill.hidden === on) pill.hidden = !on;
+    if (on) {
+      const txt = 'PARTY ' + this.room + ' · ' + this.here().length + (this.trouble ? ' · …' : '');
+      if (pill.textContent !== txt) { pill.textContent = txt; pill.setAttribute('aria-label', 'Watch party ' + this.room + ', ' + this.here().length + ' here'); }
+      pill.classList.toggle('unread', this.unread > 0 && !this.ui);
+    }
+    const cb = $('#cbParty'); if (cb.hidden === on) cb.hidden = !on;
+    $('#couchBar').classList.toggle('party', on);
+    const show = on && this.tray && Couch.on, tray = $('#reactTray');
+    if (tray.hidden === show) tray.hidden = !show;
+    cb.classList.toggle('on', show);
+    if (this.ui) this.renderPanel();
+  },
+  renderPanel(force) {
+    const ui = this.ui;
+    if (!ui || !ui.now.isConnected) { this.ui = null; return; }
+    const S = this.S, v = S && S.v ? S.v : '';
+    const title = v ? (YT.id === v && YT.title ? YT.title : S.ti || 'YouTube video') : '';
+    const key = [v, title, S && S.p, this.away, Couch.seated()].join('|');
+    if (force || key !== ui.nowKey) {
+      ui.nowKey = key; ui.now.innerHTML = ''; ui.time = null;
+      if (v) ui.now.append(h('div', { class: 'label', text: 'On the TV' }), h('b', { class: 'pn-title', text: title }), ui.time = h('span', { class: 'muted num' }));
+      else ui.now.append(h('h3', { text: 'Nothing on yet' }), h('p', { class: 'muted', style: { margin: 0 }, text: 'Pick a YouTube video and it plays for everyone.' }));
+      if (v && this.away) ui.now.append(h('p', { class: 'yt-warn', text: 'You switched to something else, so the party video is paused just for you.' }));
+      ui.now.append(h('div', { class: 'row', style: { marginTop: '8px' } },
+        v && this.away ? h('button', { class: 'btn sm primary', id: 'partyRejoin', onclick: () => this.rejoin() }, 'Watch along') : null,
+        h('button', { class: 'btn sm lilac', id: 'partyPick', onclick: () => this.pick() }, v ? 'Pick another video' : 'Pick a video'),
+        Couch.seated() ? null : h('button', { class: 'btn sm', id: 'partyCouch', onclick: () => this.toCouch() }, 'Sit on the couch')));
+    }
+    if (ui.time) { const t = (S.p ? 'Playing' : 'Paused') + ' · ' + fmtMMSS(this.expected(S)) + (YT.id === v && YT.dur ? ' / ' + fmtMMSS(YT.dur) : ''); if (ui.time.textContent !== t) ui.time.textContent = t; }
+    // who's here (people whose phones went to sleep show as away for a while)
+    const now = this.now(), all = [{ id: this.pid, n: this.name(), t: now }].concat(this.peers().filter(p => p.id !== this.pid && !p.gone && now - p.t < GONE_MS));
+    const wk = all.map(p => p.id + ':' + p.n + ':' + (now - p.t < HERE_MS)).join(',');
+    if (force || wk !== ui.whoKey) {
+      ui.whoKey = wk; ui.who.innerHTML = '';
+      all.forEach((p, i) => { const away = now - p.t >= HERE_MS; ui.who.append(h('span', { class: 'chip' + (i === 0 ? ' me' : '') + (away ? ' away' : '') }, h('i'), p.n + (i === 0 ? ' (you)' : away ? ' · away' : ''))); });
+      ui.whoLabel.textContent = 'Here · ' + this.here().length;
+    }
+    // chat
+    const C = this.R && this.R.chat && typeof this.R.chat === 'object' ? this.R.chat : {};
+    const msgs = Object.keys(C).sort().map(k => this.cleanMsg(C[k])).filter(m => m && m.k !== 'r').slice(-40);
+    const lk = msgs.length + ':' + (msgs.length ? msgs[msgs.length - 1].n + msgs[msgs.length - 1].m : '');
+    if (force || lk !== ui.logKey) {
+      ui.logKey = lk;
+      const atEnd = ui.log.scrollTop + ui.log.clientHeight >= ui.log.scrollHeight - 30;
+      ui.log.innerHTML = '';
+      if (!msgs.length) ui.log.append(h('p', { class: 'muted', style: { margin: 0 }, text: 'No messages yet. Say hi!' }));
+      msgs.forEach(m => ui.log.append(h('div', { class: 'pm' + (m.by === this.pid ? ' me' : '') }, h('b', { text: m.n }), ' ', h('span', { text: m.m }))));
+      if (atEnd || force) ui.log.scrollTop = ui.log.scrollHeight;
+    }
+    this.unread = 0;
+    const s = Panel.cur && Panel.cur.o.party && Panel.cur.el.querySelector('.panel-head p');
+    if (s) { const t = this.sub(); if (s.textContent !== t) s.textContent = t; }
+  },
+};
+
 // ---------- visual effects: weather, fireflies, shooting stars, party mode, confetti, halos, rim light ----------
 const ROOM_BOX = { 'Living Room': [-5, 4, -4, 3], 'Bedroom': [4, 9, -4, 3], 'Arcade': [-5, 1.5, -9, -4], 'Studio': [1.5, 5.5, -9, -4], 'Bathroom': [5.5, 9, -9, -4], 'Patio': [-5, 6.5, 3, 8.2] };
 const inBuilding = (x, z) => x > -5.3 && x < 9.3 && z > -9.3 && z < 3.2;
@@ -7375,6 +8054,7 @@ async function boot(hot) {
   FX.init();
   YT.init();
   Couch.init();
+  WatchParty.init();
   setupInput();
   setTimeOfDay(gameHour());
   $('#scan').hidden = !Store.d.settings.scan;
@@ -7408,11 +8088,12 @@ function start(quiet) {
   FX.rainSound();
   setTimeout(() => Buddy.shout('hiii ' + Store.d.screenName + '! tap me anytime ✨', 4), 2600);
   HUD.refreshMini();
-  if (!Store.d.outfit.charSet && !quiet) setTimeout(() => { if (!Panel.cur && !PC.open) Acts.closet('rack', true); }, 900);
+  if (WatchParty.inviteCode && !quiet) setTimeout(() => { if (!PC.open) WatchParty.open(); }, 900); // opened an invite link
+  else if (!Store.d.outfit.charSet && !quiet) setTimeout(() => { if (!Panel.cur && !PC.open) Acts.closet('rack', true); }, 900);
   else if (!quiet) setTimeout(() => toast(`<b>WELCOME HOME</b> ${isTouch ? 'Tap' : 'Click'} the ≡ button for things to do`), 900);
 }
 // test + debug handle
-window.__den = { W, Player, Cam, PC, Panel, Acts, Activity, Store, Radio, Mix, Beat, Avatar, Games, Menus, useInteractable, Vid, TV, Theater, Groove, DJ, Synth, Buddy, FX, Photo, Arcade, Tokens, Emotes, Input, buddyTools, applyPaint, Imgs, YT, TVA, Couch, tvHearing, ytParse, applyWallpapers, setWallpaper, roomAt, walkArea, setTime: (hr) => { Store.d.settings.timeMode = 'manual'; Store.d.settings.manualHour = hr; }, start: () => start(true), snap: () => { Cam.snapNext = true; Avatar.snapNext = true; Avatar.root.rotation.y = Player.yaw; }, Missions, award, STATIONS, Focus, AE, PRESETS, WARDROBE, CHARACTER, findPath, nearestInteractable, blocked, Beat, PCapps: APPS, Caps, Music, refreshClothes, CLOTHES_SPOTS };
+window.__den = { W, Player, Cam, PC, Panel, Acts, Activity, Store, Radio, Mix, Beat, Avatar, Games, Menus, useInteractable, Vid, TV, Theater, Groove, DJ, Synth, Buddy, FX, Photo, Arcade, Tokens, Emotes, Input, buddyTools, applyPaint, Imgs, YT, TVA, Couch, WatchParty, PartyNet, ytWatch, tvHearing, ytParse, applyWallpapers, setWallpaper, roomAt, walkArea, setTime: (hr) => { Store.d.settings.timeMode = 'manual'; Store.d.settings.manualHour = hr; }, start: () => start(true), snap: () => { Cam.snapNext = true; Avatar.snapNext = true; Avatar.root.rotation.y = Player.yaw; }, Missions, award, STATIONS, Focus, AE, PRESETS, WARDROBE, CHARACTER, findPath, nearestInteractable, blocked, Beat, PCapps: APPS, Caps, Music, refreshClothes, CLOTHES_SPOTS };
 W.navOk = (x, z) => !blocked(x, z);
 window.__den.tick = (dt) => frameBody(dt, false);
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data);
